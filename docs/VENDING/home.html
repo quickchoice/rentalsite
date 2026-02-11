@@ -1,0 +1,91 @@
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>QuickChoice • Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Playfair+Display:wght@600&family=Allura&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="general.css" />
+<link rel="stylesheet" href="home.css" />
+<link rel="icon" type="image/png" href="../public/web-assets/favicon.png">
+</head>
+
+<body class="page">
+<header class="topbar">
+  <a class="topbar__back" href="../vendinghome.html">← Selections</a>
+  <div class="topbar__brand">QuickChoice</div>
+  <a class="topbar__cta" href="./contact.html">Get a Free Machine</a>
+</header>
+
+<section class="hero hero--cream">
+  <h1 class="script hero__script">Smart Vending, Made Simple.</h1>
+  <p class="hero__sub">Modern vending solutions that prioritize convenience — cashless, customizable, and maintained for you.</p>
+  <div class="hero__actions">
+    <a class="btn-pill" href="./services.html">See Services</a>
+    <a class="btn-ghost" href="./about.html">About Us</a>
+  </div>
+</section>
+
+
+<!-- Business/Revenue model banner (concise; full detail on Services) -->
+<section class="section">
+  <div class="centered-narrow model-band glass">
+    <div class="model-flex">
+      <div class="model-col">
+        <h3>How It Works</h3>
+        <ul>
+          <li><strong>We provide</strong> the machine, inventory, and restocking <strong>at no cost</strong> to you.</li>
+          <li>We source and maintain hardware and cashless readers.</li>
+          <li>Your team enjoys a curated, rotating selection.</li>
+        </ul>
+      </div>
+      <div class="model-col">
+        <h3>Revenue Model</h3>
+        <ul>
+          <li>QuickChoice receives product sales.</li>
+          <li>After expenses (restocking, insurance), <strong>you receive a negotiated share</strong> of net profit.</li>
+        </ul>
+        <div style="margin-top:8px">
+          <a class="btn-pill" href="./contact.html">Please call to discuss</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Mascot + What We Do -->
+<section class="section section--mascot">
+  <div class="mascot-wrap">
+    <img src="../public/web-assets/vendinglean.png" alt="QuickChoice mascot beside vending machine" class="mascot-img">
+    <div class="mascot-content">
+      <h2 class="section__title">What We Do</h2>
+      <div class="cards-vertical">
+        <a class="rounded-card" href="./services.html#vending">
+          <h3>Vending</h3>
+          <p>Tap-to-pay from phones, touchless readers, dependable service.</p>
+        </a>
+        <a class="rounded-card" href="./services.html#markets">
+          <h3>Micro-Markets</h3>
+          <p>Open coolers & shelves with self-checkout.</p>
+        </a>
+        <a class="rounded-card" href="./services.html#pantry">
+          <h3>Office Snacks & Drinks</h3>
+          <p>Curated rotations and freshness maintained by us.</p>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div>© <span id="y"></span> QuickChoice Vending</div>
+  <nav class="footer__nav">
+    <a href="./about.html">About</a>
+    <a href="./services.html">Services</a>
+    <a href="./contact.html">Contact</a>
+  </nav>
+</footer>
+
+<script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+</body>
+</html>
+

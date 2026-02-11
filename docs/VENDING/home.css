@@ -1,0 +1,26 @@
+/* =================== QuickChoice • home.css =================== */
+
+.hero.hero--cream{ background:none; } /* flatter, glassy transition from index */
+.section--mascot{ background:none; padding:40px 18px; }
+.mascot-wrap{ display:flex; align-items:center; justify-content:center; gap:40px; flex-wrap:nowrap; max-width:1100px; margin:0 auto; }
+.mascot-img{ width:560px; height:auto; flex-shrink:0; }
+.mascot-content{ flex:1; max-width:520px; }
+.cards-vertical{ display:flex; flex-direction:column; gap:16px; }
+
+@media (max-width:760px){
+  .mascot-wrap{ flex-direction:column; gap:20px; }
+  .mascot-img{ width:320px; }
+  .mascot-content{ max-width:360px; }
+}
+
+/* small spacing nips */
+.section{ padding-top:24px; }
+.tagline-band {
+  text-align:center;
+  font-size:1.2rem;
+  font-weight:600;
+  padding:18px 12px;
+  color:var(--ink);
+  background:linear-gradient(180deg, #fefaf4 0%, #fff 100%);
+  border-bottom:1px solid var(--line);
+}

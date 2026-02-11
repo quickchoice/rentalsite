@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>QuickChoice • Testimonials</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Playfair+Display:wght@600&family=Allura&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="general.css" />
+<link rel="icon" type="image/png" href="../public/web-assets/favicon.png">
+
+<style>
+  /* Lightweight page-specific polish */
+  .soon-wrap{
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 18px;
+  }
+  .soon-card{
+    background: linear-gradient(180deg,#fff9ec,#fdecd2);
+    border: 1.5px solid var(--rim);
+    border-radius: var(--r-xl);
+    box-shadow: var(--lift);
+    padding: 24px;
+    text-align: center;
+  }
+  .soon-title{
+    margin: 0 0 8px 0;
+    font-family: "Playfair Display", serif;
+    color: #0c2c41;
+    font-size: clamp(22px, 3.2vw, 28px);
+  }
+  .soon-sub{
+    margin: 0 0 18px 0;
+    color: var(--muted);
+  }
+  .review-btn{
+    display:inline-block;
+    font-weight:800;
+    color:#1a4c74;
+    background:linear-gradient(180deg,#fff9ec,#ffe7c1);
+    border:1.5px solid var(--rim);
+    border-radius: var(--r-pill);
+    padding:12px 18px;
+    text-decoration:none;
+    box-shadow: var(--lift);
+  }
+  .review-btn:focus-visible{ outline: 3px solid #ffda7a; outline-offset: 3px; }
+</style>
+</head>
+
+<body class="page">
+<header class="topbar">
+  <a class="topbar__back" href="../vendinghome.html">← Selections</a>
+  <div class="topbar__brand">QuickChoice</div>
+  <a class="topbar__cta" href="./contact.html">Get a Free Machine</a>
+</header>
+
+<section class="hero hero--cream">
+  <h1 class="script hero__script">Testimonials</h1>
+</section>
+
+<section class="section">
+  <div class="soon-wrap">
+    <div class="soon-card" role="status" aria-live="polite">
+      <h2 class="soon-title">Partner testimonials are coming soon</h2>
+      <p class="soon-sub">In the meantime, we’d be grateful if you shared your experience with QuickChoice.</p>
+      <a class="review-btn" href="https://g.page/r/YOUR-GOOGLE-REVIEW-LINK" target="_blank" rel="noopener">
+        Leave a Google Review
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div>© <span id="y"></span> QuickChoice Vending</div>
+  <nav class="footer__nav">
+    <a href="./home.html">Home</a>
+    <a href="./services.html">Services</a>
+    <a href="./contact.html">Contact</a>
+  </nav>
+</footer>
+
+<script>
+  document.getElementById('y').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
+

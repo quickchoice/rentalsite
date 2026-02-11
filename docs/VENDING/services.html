@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>QuickChoice • Services</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Playfair+Display:wght@600&family=Allura&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="general.css" />
+<link rel="stylesheet" href="services.css" />
+<link rel="icon" type="image/png" href="../public/web-assets/favicon.png">
+</head>
+<body class="page">
+<header class="topbar">
+  <a class="topbar__back" href="../vendinghome.html">← Selections</a>
+  <div class="topbar__brand">QuickChoice</div>
+  <a class="topbar__cta" href="./contact.html">Get a Free Machine</a>
+</header>
+
+<section class="hero hero--cream">
+  <h1 class="script hero__script">Tailored to Your Location</h1>
+  <p class="hero__sub hero__sub--big">
+    Pick what you’d like stocked. We provide the machine, inventory, and restocking — <strong>no cost to you</strong>.
+  </p>
+</section>
+
+<!-- Business & Revenue Model (expanded) -->
+<section class="section">
+  <div class="centered-narrow model-band glass">
+    <div class="model-flex">
+      <div class="model-col">
+        <h3>What We Provide</h3>
+        <ul>
+          <li>Vending machine, cashless readers, and software setup.</li>
+          <li>Inventory sourcing and restocking (rotation based on demand).</li>
+          <li>Maintenance, uptime tracking, and service response.</li>
+        </ul>
+      </div>
+      <div class="model-col">
+        <h3>How You Profit</h3>
+        <ul>
+          <li>We receive product sales.</li>
+          <li>After expenses (restocking, insurance), you receive a negotiated share of <strong>net profit</strong>.</li>
+          <li>Clear monthly reporting and SKU-level transparency.</li>
+        </ul>
+        <div style="margin-top:8px">
+          <a class="btn-pill" href="./contact.html">Contact us</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="sets-us-apart">
+  <h2 class="section__title">What Sets Us Apart</h2>
+  <div class="cards-3">
+    <div class="rounded-card"><h3>Innovation</h3><p>Mobile-first flows, tap-to-pay, simple reorders, transparent reporting.</p></div>
+    <div class="rounded-card"><h3>Service</h3><p>Fast restocks and proactive maintenance so you never have to chase support.</p></div>
+    <div class="rounded-card"><h3>Selection</h3><p>Rotations guided by real purchases — better-for-you plus crowd favorites.</p></div>
+  </div>
+</section>
+
+<!-- Simple “how it works” strip -->
+<section class="section section--soft">
+  <div class="how">
+    <div class="how__item"><span class="how__num">1</span>Browse snacks & drinks</div>
+    <div class="how__item"><span class="how__num">2</span>Tap to shortlist</div>
+    <div class="how__item"><span class="how__num">3</span>Send list with your address</div>
+  </div>
+</section>
+
+<!-- Controls -->
+<section class="section">
+  <div class="controls">
+    <div class="chips" role="tablist" aria-label="Snack categories">
+      <button class="chip is-active" data-filter="all" role="tab" aria-selected="true">All</button>
+      <button class="chip" data-filter="snacks" role="tab">Snacks</button>
+      <button class="chip" data-filter="chips" role="tab">Chips</button>
+      <button class="chip" data-filter="candy" role="tab">Candy</button>
+      <button class="chip" data-filter="crackers" role="tab">Crackers</button>
+      <button class="chip" data-filter="drinks" role="tab">Drinks</button>
+    </div>
+
+    <label class="search">
+      <input id="searchInput" type="search" placeholder="Search (e.g., ‘Clif’, ‘La Croix’, ‘Gatorade’)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5 21.5 20l-6-6zM10 14a4 4 0 110-8 4 4 0 010 8z"/></svg>
+    </label>
+  </div>
+
+  <!-- Grid -->
+<p class="missing-item">
+  If your desired product isn’t listed below, we can source it at no extra cost —
+  <a class="missing-btn" href="./contact.html" id="inquireLink">click here to inquire</a>.
+</p>
+
+<!-- ✅ The grid should NOT be inside the paragraph -->
+<div id="snackGrid" class="grid" aria-live="polite"></div>
+  <!-- ✅ Curated selection disclaimer -->
+
+  <!-- Sticky selection bar -->
+  <div class="sticky" id="stickyBar" hidden>
+    <div class="sticky__left">
+      <strong id="selCount">0</strong> selected
+    </div>
+    <div class="sticky__right">
+      <a class="btn-pill" id="contactBtn" href="./contact.html">Send list</a>
+      <button class="btn-ghost" id="clearBtn" type="button">Clear</button>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div>© <span id="y"></span> QuickChoice Vending</div>
+  <nav class="footer__nav"><a href="./home.html">Home</a><a href="./about.html">About</a><a href="./contact.html">Contact</a></nav>
+</footer>
+
+<script>document.getElementById('y').textContent=new Date().getFullYear()</script>
+<script src="services.js" defer></script>
+</body>
+</html>
+
