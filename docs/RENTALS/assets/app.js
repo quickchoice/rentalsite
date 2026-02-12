@@ -1,9 +1,4 @@
-﻿const locations = [
-  { id: "chs", name: "Charleston, SC" },
-  { id: "myr", name: "Myrtle Beach, SC" }
-];
-
-const categories = [
+﻿const categories = [
   { id: "baby", name: "Baby Equipment" },
   { id: "beach", name: "Beach Gear" },
   { id: "access", name: "Handicap Options" }
@@ -173,11 +168,9 @@ const storage = {
 };
 
 const state = {
-  locationId: storage.get("qc_location", "chs"),
   orderMeta: storage.get("qc_order_meta", {
     startDate: "",
-    endDate: "",
-    deliveryAddress: ""
+    endDate: ""
   }),
   contact: storage.get("qc_contact", {
     fullName: "",
@@ -190,6 +183,10 @@ const state = {
 
 const rentalsBase = window.location.pathname.toLowerCase().includes("/rentals/") ? "." : "RENTALS";
 const rentalsPath = path => `${rentalsBase}/${path}`;
+const SESSION_FIRST_ADD_KEY = "qc_first_add_done";
+let badgeCountCache = state.cart.reduce((sum, line) => sum + line.qty, 0);
+let interactionVersion = 0;
+let autoOpenTimer = null;
 const parseDateLocal = value => {
   if (!value) return null;
   const [year, month, day] = value.split("-").map(Number);
@@ -198,14 +195,9 @@ const parseDateLocal = value => {
 };
 
 function saveState() {
-  storage.set("qc_location", state.locationId);
   storage.set("qc_order_meta", state.orderMeta);
   storage.set("qc_contact", state.contact);
   storage.set("qc_cart", state.cart);
-}
-
-function getLocationName() {
-  return locations.find(l => l.id === state.locationId)?.name || "—";
 }
 
 function getDays() {
@@ -235,12 +227,77 @@ function cartSubtotal() {
   }, 0);
 }
 
-function addToCart(productId, qty = 1) {
-  const existing = state.cart.find(line => line.productId === productId);
-  if (existing) existing.qty += qty;
-  else state.cart.push({ productId, qty });
+function animateCartBadgeBounce() {
+  document.querySelectorAll("[data-cart-count]").forEach(el => {
+    el.classList.remove("badge-bounce");
+    void el.offsetWidth;
+    el.classList.add("badge-bounce");
+  });
+}
+
+function closeCartDrawer() {
+  document.querySelector("[data-cart-drawer]")?.classList.remove("open");
+  document.body.classList.remove("cart-open");
+}
+
+function spawnBubblePop(button) {
+  if (!button) return;
+  const burst = document.createElement("span");
+  burst.className = "bubble-pop-layer";
+  for (let i = 0; i < 8; i++) {
+    const dot = document.createElement("span");
+    dot.className = "bubble-pop-dot";
+    const angle = (Math.PI * 2 * i) / 8 + Math.random() * 0.25;
+    const distance = 12 + Math.random() * 18;
+    dot.style.setProperty("--dx", `${Math.cos(angle) * distance}px`);
+    dot.style.setProperty("--dy", `${Math.sin(angle) * distance}px`);
+    dot.style.animationDelay = `${i * 0.01}s`;
+    burst.appendChild(dot);
+  }
+  button.appendChild(burst);
+  setTimeout(() => burst.remove(), 360);
+}
+
+function openCartDrawer() {
+  document.querySelector("[data-cart-drawer]")?.classList.add("open");
+  document.body.classList.add("cart-open");
+  document.querySelectorAll("[data-cart-open]").forEach(btn => {
+    btn.classList.remove("is-pop");
+    void btn.offsetWidth;
+    btn.classList.add("is-pop");
+    spawnBubblePop(btn);
+  });
+}
+
+function scheduleCartAutoOpen(shouldOpen) {
+  if (!shouldOpen) return;
+  if (autoOpenTimer) clearTimeout(autoOpenTimer);
+  const marker = interactionVersion;
+  autoOpenTimer = setTimeout(() => {
+    if (marker !== interactionVersion) return;
+    openCartDrawer();
+  }, 200);
+}
+
+function addItemsToCart(items = []) {
+  if (!items.length) return;
+  const wasEmpty = state.cart.length === 0;
+  const firstAddThisSession = sessionStorage.getItem(SESSION_FIRST_ADD_KEY) !== "1";
+
+  items.forEach(({ productId, qty = 1 }) => {
+    const existing = state.cart.find(line => line.productId === productId);
+    if (existing) existing.qty += qty;
+    else state.cart.push({ productId, qty });
+  });
+
+  sessionStorage.setItem(SESSION_FIRST_ADD_KEY, "1");
   saveState();
   renderCart();
+  scheduleCartAutoOpen((wasEmpty && state.cart.length > 0) || firstAddThisSession);
+}
+
+function addToCart(productId, qty = 1) {
+  addItemsToCart([{ productId, qty }]);
 }
 
 function removeFromCart(productId) {
@@ -258,10 +315,12 @@ function updateQty(productId, delta) {
 }
 
 function renderCart() {
+  const count = state.cart.reduce((sum, line) => sum + line.qty, 0);
   document.querySelectorAll("[data-cart-count]").forEach(el => {
-    const count = state.cart.reduce((sum, line) => sum + line.qty, 0);
     el.textContent = count;
   });
+  if (count > badgeCountCache) animateCartBadgeBounce();
+  badgeCountCache = count;
 
   document.querySelectorAll("[data-cart-subtotal]").forEach(el => {
     el.textContent = formatMoney(cartSubtotal());
@@ -293,56 +352,39 @@ function renderCart() {
       container.appendChild(row);
     });
   });
-
-  document.querySelectorAll("[data-meta-location]").forEach(el => {
-    el.textContent = getLocationName();
-  });
   document.querySelectorAll("[data-meta-dates]").forEach(el => {
     const { startDate, endDate } = state.orderMeta;
-    el.textContent = startDate && endDate ? `${startDate} → ${endDate}` : "Dates not set";
+    el.textContent = startDate && endDate ? `${startDate} → ${endDate} (${getDays()} Days)` : "—";
   });
-  document.querySelectorAll("[data-meta-address]").forEach(el => {
-    el.textContent = state.orderMeta.deliveryAddress || "Address not set";
-  });
-
-  const hasItems = state.cart.length > 0;
-  document.querySelectorAll("[data-mobile-cart]").forEach(el => {
-    el.classList.toggle("show", hasItems);
-  });
-  const floating = document.querySelector("[data-floating-checkout]");
-  if (floating) floating.style.display = hasItems ? "inline-flex" : "none";
 }
 
 function bindCartControls() {
+  document.addEventListener("click", () => {
+    interactionVersion += 1;
+  }, true);
+
   document.body.addEventListener("click", e => {
     const target = e.target;
-    if (target.matches("[data-cart-open]")) {
-      document.querySelector("[data-cart-drawer]")?.classList.add("open");
+    const openBtn = target.closest("[data-cart-open]");
+    if (openBtn) {
+      openCartDrawer();
     }
-    if (target.matches("[data-cart-close]")) {
-      document.querySelector("[data-cart-drawer]")?.classList.remove("open");
+    if (target.closest("[data-cart-close]") || target.closest("[data-cart-backdrop]")) {
+      closeCartDrawer();
     }
+    const drawer = document.querySelector("[data-cart-drawer]");
+    if (drawer?.classList.contains("open") && !target.closest("[data-cart-drawer]") && !target.closest("[data-cart-open]")) closeCartDrawer();
     if (target.matches("[data-inc]")) updateQty(target.dataset.inc, 1);
     if (target.matches("[data-dec]")) updateQty(target.dataset.dec, -1);
     if (target.matches("[data-remove]")) removeFromCart(target.dataset.remove);
-    if (target.matches("[data-floating-checkout]")) window.location.href = rentalsPath("checkout.html");
-  });
-}
-
-function bindLocationToggle() {
-  document.querySelectorAll("[data-location-toggle] .seg-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      state.locationId = btn.dataset.location;
-      saveState();
-      syncLocationToggle();
-      renderCart();
-    });
-  });
-}
-
-function syncLocationToggle() {
-  document.querySelectorAll("[data-location-toggle] .seg-btn").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.location === state.locationId);
+    if (target.closest("[data-checkout-nav]")) {
+      if (!state.cart.length) window.location.href = rentalsPath("empty-cart.html");
+      else window.location.href = rentalsPath("summary.html");
+    }
+    if (target.closest("[data-nav-back]")) {
+      if (window.history.length > 1) window.history.back();
+      else window.location.href = rentalsPath("category.html?cat=baby");
+    }
   });
 }
 
@@ -351,26 +393,76 @@ function bindOrderMetaForms() {
     const errorEl = form.querySelector("[data-form-error]");
     form.startDate.value = state.orderMeta.startDate || "";
     form.endDate.value = state.orderMeta.endDate || "";
-    form.deliveryAddress.value = state.orderMeta.deliveryAddress || "";
 
     form.addEventListener("submit", e => {
       e.preventDefault();
       const startDate = form.startDate.value;
       const endDate = form.endDate.value;
-      const deliveryAddress = form.deliveryAddress.value.trim();
 
-      if (!startDate || !endDate || !deliveryAddress) {
-        if (errorEl) errorEl.textContent = "Please add all trip details.";
+      if (!startDate || !endDate) {
+        if (errorEl) errorEl.textContent = "Please select start and end dates.";
         return;
       }
-      state.orderMeta = { startDate, endDate, deliveryAddress };
+      state.orderMeta = { startDate, endDate };
       saveState();
       if (errorEl) errorEl.textContent = "";
       renderCart();
-      if (document.body.dataset.page === "home") {
+      if (document.body.dataset.page === "checkout") {
         window.location.href = rentalsPath("category.html?cat=baby");
       }
     });
+  });
+}
+
+function runShoppingButtonLoading(button, action) {
+  if (!button || button.dataset.loading === "1") return;
+  const original = button.textContent.trim();
+  button.dataset.loading = "1";
+  button.classList.add("is-loading");
+  button.innerHTML = `<span class="btn-spinner" aria-hidden="true"></span><span>Loading</span>`;
+  setTimeout(() => {
+    action();
+    button.classList.remove("is-loading");
+    button.dataset.loading = "0";
+    button.textContent = original;
+  }, 300);
+}
+
+function setupCategoryPicker(currentCategoryId) {
+  const picker = document.querySelector("[data-category-picker]");
+  const menu = document.querySelector("[data-category-menu]");
+  if (!picker || !menu) return;
+
+  menu.innerHTML = "";
+  categories.forEach(cat => {
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = "category-option";
+    item.dataset.cat = cat.id;
+    item.textContent = cat.name;
+    if (cat.id === currentCategoryId) item.classList.add("active");
+    menu.appendChild(item);
+  });
+
+  const closeMenu = () => {
+    picker.setAttribute("aria-expanded", "false");
+    menu.hidden = true;
+  };
+
+  picker.addEventListener("click", () => {
+    const expanded = picker.getAttribute("aria-expanded") === "true";
+    picker.setAttribute("aria-expanded", String(!expanded));
+    menu.hidden = expanded;
+  });
+
+  menu.addEventListener("click", e => {
+    const option = e.target.closest(".category-option");
+    if (!option) return;
+    window.location.href = rentalsPath(`category.html?cat=${option.dataset.cat}`);
+  });
+
+  document.addEventListener("click", e => {
+    if (!picker.contains(e.target) && !menu.contains(e.target)) closeMenu();
   });
 }
 
@@ -381,13 +473,14 @@ function renderCategoryPage() {
   const cat = categories.find(c => c.id === catId) || categories[0];
 
   document.querySelector("[data-category-title]").textContent = cat.name;
-  document.querySelector("[data-category-badge]").textContent = "Category";
+  document.querySelector("[data-category-badge]").textContent = "I'm looking for...";
   document.querySelector("[data-category-intro]").textContent =
     cat.id === "baby"
       ? "Clean, comfort-first essentials delivered to your rental."
       : cat.id === "beach"
       ? "Soft-sand ready, light-to-carry beach gear."
       : "Accessibility rentals for a safe, easy stay.";
+  setupCategoryPicker(cat.id);
 
   const bundleGrid = document.querySelector("[data-bundles-grid]");
   bundleGrid.innerHTML = "";
@@ -399,7 +492,7 @@ function renderCategoryPage() {
       <strong>${bundle.name}</strong>
       <span class="muted">${bundle.description}</span>
       <span class="price">${formatMoney(bundle.pricePerDay)}/day</span>
-      <button class="btn primary" data-bundle-add="${bundle.id}">Add bundle</button>
+      <button class="btn primary shop-btn" data-bundle-add="${bundle.id}">Add bundle</button>
     `;
     bundleGrid.appendChild(card);
   });
@@ -424,7 +517,7 @@ function renderCategoryPage() {
         <span class="muted">${item.shortDescription}</span>
         <span class="price">${formatMoney(item.pricePerDay)}/day</span>
         <div class="card-actions">
-          <button class="btn primary" data-add="${item.id}">Quick add</button>
+          <button class="btn primary shop-btn" data-add="${item.id}">Quick add</button>
           <a class="btn secondary" href="product.html?id=${item.id}">View details</a>
         </div>
       `;
@@ -437,12 +530,15 @@ function renderCategoryPage() {
   renderProducts();
 
   document.body.addEventListener("click", e => {
-    const t = e.target;
-    if (t.matches("[data-add]")) addToCart(t.dataset.add, 1);
-    if (t.matches("[data-bundle-add]")) {
-      const bundle = bundles.find(b => b.id === t.dataset.bundleAdd);
+    const addBtn = e.target.closest("[data-add]");
+    if (addBtn) {
+      runShoppingButtonLoading(addBtn, () => addToCart(addBtn.dataset.add, 1));
+    }
+    const bundleBtn = e.target.closest("[data-bundle-add]");
+    if (bundleBtn) {
+      const bundle = bundles.find(b => b.id === bundleBtn.dataset.bundleAdd);
       if (!bundle) return;
-      bundle.items.forEach(item => addToCart(item.productId, item.qty));
+      runShoppingButtonLoading(bundleBtn, () => addItemsToCart(bundle.items));
     }
   });
 }
@@ -481,71 +577,40 @@ function renderProductPage() {
 
 function renderCheckoutPage() {
   if (document.body.dataset.page !== "checkout") return;
+  const errorEl = document.querySelector("[data-form-error]");
+  const nextBtn = document.querySelector("[data-go-shopping]");
+  const form = document.querySelector("[data-order-meta-form]");
+  if (!nextBtn || !form) return;
 
-  const checkoutForm = document.querySelector("[data-checkout-form]");
+  nextBtn.addEventListener("click", () => {
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+    const startDate = form.startDate.value;
+    const endDate = form.endDate.value;
+    if (!startDate || !endDate) {
+      if (errorEl) errorEl.textContent = "Please select start and end dates.";
+      return;
+    }
+    state.orderMeta = { startDate, endDate };
+    saveState();
+    if (errorEl) errorEl.textContent = "";
+    window.location.href = rentalsPath("category.html?cat=baby");
+  });
+}
+
+function renderSummaryPage() {
+  if (document.body.dataset.page !== "summary") return;
   const checkoutError = document.querySelector("[data-checkout-error]");
   const submitBtn = document.querySelector("[data-checkout-submit]");
-  const stepButtons = document.querySelectorAll("[data-next-step]");
-  const steps = document.querySelectorAll(".checkout-step");
-
-  const summaryName = document.querySelector("[data-summary-name]");
-  const summaryEmail = document.querySelector("[data-summary-email]");
   const summaryDates = document.querySelector("[data-summary-dates]");
-  const summaryAddress = document.querySelector("[data-summary-address]");
-  const summaryLocation = document.querySelector("[data-summary-location]");
+  const { startDate, endDate } = state.orderMeta;
+  if (summaryDates) summaryDates.textContent = startDate && endDate ? `${startDate} → ${endDate}` : "—";
 
-  function showStep(step) {
-    steps.forEach(s => s.classList.toggle("active", s.dataset.step === String(step)));
-  }
-
-  function syncSummary() {
-    summaryName.textContent = state.contact.fullName || "—";
-    summaryEmail.textContent = state.contact.email || "—";
-    const { startDate, endDate, deliveryAddress } = state.orderMeta;
-    summaryDates.textContent = startDate && endDate ? `${startDate} → ${endDate}` : "—";
-    summaryAddress.textContent = deliveryAddress || "—";
-    summaryLocation.textContent = getLocationName();
-  }
-
-  checkoutForm.fullName.value = state.contact.fullName || "";
-  checkoutForm.email.value = state.contact.email || "";
-  checkoutForm.phone.value = state.contact.phone || "";
-  checkoutForm.notes.value = state.contact.notes || "";
-
-  checkoutForm.addEventListener("input", () => {
-    state.contact.fullName = checkoutForm.fullName.value.trim();
-    state.contact.email = checkoutForm.email.value.trim();
-    state.contact.phone = checkoutForm.phone.value.trim();
-    state.contact.notes = checkoutForm.notes.value.trim();
-    saveState();
-    syncSummary();
-  });
-
-  stepButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const target = Number(btn.dataset.nextStep);
-      if (btn.closest("[data-step='1']")) {
-        const metaForm = document.querySelector("[data-order-meta-form]");
-        if (!metaForm.checkValidity()) {
-          metaForm.reportValidity();
-          return;
-        }
-      }
-      if (btn.closest("[data-step='2']")) {
-        if (!checkoutForm.checkValidity()) {
-          checkoutForm.reportValidity();
-          return;
-        }
-      }
-      showStep(target);
-      syncSummary();
-    });
-  });
-
-  checkoutForm.addEventListener("submit", async e => {
-    e.preventDefault();
-    const { startDate, endDate, deliveryAddress } = state.orderMeta;
-    if (!startDate || !endDate || !deliveryAddress) {
+  submitBtn?.addEventListener("click", async () => {
+    const { startDate, endDate } = state.orderMeta;
+    if (!startDate || !endDate) {
       checkoutError.textContent = "Please add trip details before paying.";
       return;
     }
@@ -557,12 +622,6 @@ function renderCheckoutPage() {
     await startStripeCheckout(state.cart, state.orderMeta);
     alert("Stripe checkout stub. Connect backend to proceed.");
   });
-
-  submitBtn?.addEventListener("click", () => {
-    checkoutForm.requestSubmit();
-  });
-
-  syncSummary();
 }
 
 function initCarousel() {
@@ -630,6 +689,7 @@ function initCalendar() {
         btn.type = "button";
         btn.className = "cal-day";
         btn.innerHTML = `<span class="cal-day-num">${day}</span>`;
+        btn.dataset.date = formatDate(date);
 
         const hasSelection = !!start;
         const inRange = start && end && date >= start && date <= end;
@@ -638,7 +698,7 @@ function initCalendar() {
         if (sameDay(date, start)) btn.classList.add("selected", "start");
         if (sameDay(date, end)) btn.classList.add("selected", "end");
 
-        btn.addEventListener("click", () => {
+        btn.addEventListener("click", event => {
           const currentStart = parseDateLocal(state.orderMeta.startDate);
           const currentEnd = parseDateLocal(state.orderMeta.endDate);
           if (!start || (start && end)) {
@@ -654,9 +714,16 @@ function initCalendar() {
           updateSelected();
           renderAllCalendars();
           renderCart();
+          const calendarRect = cal.getBoundingClientRect();
+          const clickPoint = {
+            x: event.clientX - calendarRect.left,
+            y: event.clientY - calendarRect.top
+          };
+          celebrateCalendarSelection(cal, selectedLabel, btn.dataset.date, clickPoint);
         });
         grid.appendChild(btn);
       }
+      renderRangeEnergy(grid);
     }
 
     function updateSelected() {
@@ -695,17 +762,251 @@ function initCalendar() {
   renderAllCalendars();
 }
 
+function renderRangeEnergy(grid) {
+  if (!grid) return;
+  if (grid._rangeEnergyRaf) {
+    cancelAnimationFrame(grid._rangeEnergyRaf);
+    grid._rangeEnergyRaf = null;
+  }
+  grid.querySelectorAll(".range-energy-strip").forEach(el => el.remove());
+  const inRange = Array.from(grid.querySelectorAll(".cal-day.range:not(.inactive)"));
+  if (!inRange.length) return;
+
+  const rows = new Map();
+  inRange.forEach(cell => {
+    const key = String(cell.offsetTop);
+    if (!rows.has(key)) rows.set(key, []);
+    rows.get(key).push(cell);
+  });
+
+  const orderedRows = Array.from(rows.entries())
+    .sort((a, b) => Number(a[0]) - Number(b[0]))
+    .map(([top, cells]) => {
+      cells.sort((a, b) => a.offsetLeft - b.offsetLeft);
+      const first = cells[0];
+      const last = cells[cells.length - 1];
+      if (!first || !last) return null;
+      const beamHeight = Math.round(first.offsetHeight * 1.2);
+      const centerY = Number(top) + first.offsetHeight / 2;
+      const firstIsRangeStart = first.classList.contains("start");
+      const lastIsRangeEnd = last.classList.contains("end");
+      const left = firstIsRangeStart
+        ? first.offsetLeft + first.offsetWidth / 2
+        : first.offsetLeft;
+      const right = lastIsRangeEnd
+        ? last.offsetLeft + last.offsetWidth / 2
+        : last.offsetLeft + last.offsetWidth;
+      return { first, last, left, right, centerY, beamHeight };
+    })
+    .filter(Boolean);
+
+  if (!orderedRows.length) return;
+
+  const strip = document.createElement("span");
+  strip.className = "range-energy-strip";
+  grid.appendChild(strip);
+
+  const baseDurationMs = 1140;
+  const tail = 464;
+  const cycleMs = baseDurationMs * orderedRows.length;
+  const startAt = performance.now();
+
+  function tick(now) {
+    if (!grid.isConnected) return;
+    const elapsed = (now - startAt) % cycleMs;
+    const rowIndex = Math.floor(elapsed / baseDurationMs);
+    const rowElapsed = elapsed - rowIndex * baseDurationMs;
+    const progress = rowElapsed / baseDurationMs;
+    const row = orderedRows[rowIndex] || orderedRows[0];
+    const rowWidth = Math.max(2, row.right - row.left);
+
+    strip.style.left = `${row.left}px`;
+    strip.style.top = `${row.centerY - row.beamHeight / 2}px`;
+    strip.style.width = `${rowWidth}px`;
+    strip.style.height = `${row.beamHeight}px`;
+    strip.style.backgroundPosition = `${-tail + progress * (rowWidth + tail * 2)}px 0`;
+
+    grid._rangeEnergyRaf = requestAnimationFrame(tick);
+  }
+
+  grid._rangeEnergyRaf = requestAnimationFrame(tick);
+}
+
+function celebrateCalendarSelection(calendar, selectedLabel, clickedDate, clickPoint) {
+  if (!calendar || !selectedLabel) return;
+  selectedLabel.classList.add("celebrate");
+  const hasCompleteRange = !!(state.orderMeta.startDate && state.orderMeta.endDate);
+  if (hasCompleteRange) {
+    const rangeKey = `${state.orderMeta.startDate}|${state.orderMeta.endDate}`;
+    const clickedEnd = clickedDate && clickedDate === state.orderMeta.endDate;
+    if (clickedEnd && calendar.dataset.lastBurstKey !== rangeKey) {
+      calendar.dataset.lastBurstKey = rangeKey;
+      spawnCalendarConfetti(calendar, clickedDate, clickPoint);
+    }
+  }
+  setTimeout(() => {
+    selectedLabel.classList.remove("celebrate");
+  }, 850);
+}
+
+function spawnCalendarConfetti(calendar, endDateValue, clickPoint) {
+  const layer = document.createElement("div");
+  layer.className = "confetti-layer";
+  const colors = ["#2f7fd3", "#f07b63", "#f4a83a", "#67c98c", "#8a8df0", "#ffffff"];
+  const pieces = 28;
+  const targetDay = endDateValue
+    ? calendar.querySelector(`.cal-day[data-date='${endDateValue}']`)
+    : null;
+  const originX = clickPoint && Number.isFinite(clickPoint.x)
+    ? clickPoint.x
+    : (targetDay ? targetDay.offsetLeft + targetDay.offsetWidth / 2 : calendar.clientWidth / 2);
+  const originY = clickPoint && Number.isFinite(clickPoint.y)
+    ? clickPoint.y
+    : (targetDay ? targetDay.offsetTop + targetDay.offsetHeight / 2 : calendar.clientHeight / 2);
+
+  for (let i = 0; i < pieces; i++) {
+    const part = document.createElement("span");
+    part.className = "confetti-piece";
+    const angle = (Math.PI * 2 * i) / pieces + Math.random() * 0.18;
+    const distance = 34 + Math.random() * 48;
+    part.style.setProperty("--dx", `${Math.cos(angle) * distance}px`);
+    part.style.setProperty("--dy", `${Math.sin(angle) * distance - 10}px`);
+    part.style.setProperty("--rot", `${Math.round((Math.random() - 0.5) * 540)}deg`);
+    part.style.background = colors[i % colors.length];
+    if (Math.random() > 0.5) part.style.borderRadius = "2px";
+    part.style.left = `${originX}px`;
+    part.style.top = `${originY}px`;
+    layer.appendChild(part);
+  }
+  calendar.appendChild(layer);
+  setTimeout(() => layer.remove(), 900);
+}
+
+function initScrollReveal() {
+  const targets = document.querySelectorAll(".reveal");
+  if (!targets.length || !("IntersectionObserver" in window)) {
+    targets.forEach(el => el.classList.add("is-visible"));
+    return;
+  }
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("is-visible");
+      obs.unobserve(entry.target);
+    });
+  }, { threshold: 0.15 });
+  targets.forEach(el => observer.observe(el));
+}
+
+function initCountUp() {
+  const counters = document.querySelectorAll("[data-count-to]");
+  if (!counters.length) return;
+  const ordered = Array.from(counters);
+  setTimeout(async () => {
+    for (const counter of ordered) {
+      await animateCounter(counter);
+      if ((counter.dataset.countKey || "") === "rating") {
+        await runStarSlam();
+      }
+      if ((counter.dataset.countKey || "") === "speed") {
+        showClockSpin();
+      }
+    }
+  }, 300);
+}
+
+function animateCounter(counter) {
+  return new Promise(resolve => {
+    const target = Number(counter.dataset.countTo || 0);
+    const suffix = counter.dataset.countSuffix || "";
+    let value = 0;
+    const totalTicks = 28;
+    const step = Math.max(1, Math.ceil(target / totalTicks));
+    const timer = setInterval(() => {
+      value = Math.min(target, value + step);
+      counter.childNodes[0].nodeValue = `${value}${suffix}`;
+      if (value < target) return;
+      clearInterval(timer);
+      resolve();
+    }, 32);
+  });
+}
+
+function runStarSlam() {
+  const stars = document.querySelectorAll("[data-slam-stars] span");
+  if (!stars.length) return Promise.resolve();
+  return new Promise(resolve => {
+    stars.forEach((star, idx) => {
+      setTimeout(() => {
+        star.classList.add("slam");
+        if (idx === stars.length - 1) {
+          setTimeout(resolve, 300);
+        }
+      }, idx * 110);
+    });
+  });
+}
+
+function showClockSpin() {
+  const clock = document.querySelector("[data-mini-clock]");
+  if (!clock) return;
+  clock.classList.add("show");
+  clock.classList.add("spin");
+  setTimeout(() => {
+    clock.classList.remove("spin");
+  }, 1000);
+}
+
+function initSocialProof() {
+  const items = Array.from(document.querySelectorAll(".testimonial"));
+  if (items.length > 1) {
+    let idx = 0;
+    setInterval(() => {
+      items[idx].classList.remove("active");
+      idx = (idx + 1) % items.length;
+      items[idx].classList.add("active");
+    }, 3800);
+  }
+
+  const liveBooking = document.querySelector("[data-live-booking]");
+  if (!liveBooking) return;
+  const updates = [
+    "A family just booked a crib.",
+    "A guest just added a beach wagon.",
+    "A booking just added a high chair."
+  ];
+  let notice = 0;
+  setInterval(() => {
+    notice = (notice + 1) % updates.length;
+    liveBooking.textContent = updates[notice];
+  }, 4300);
+}
+
+function enforceDateRangeBeforeShopping() {
+  const page = document.body.dataset.page;
+  const requiresDates = page === "category" || page === "product" || page === "summary";
+  const hasDates = !!(state.orderMeta.startDate && state.orderMeta.endDate);
+  if (!requiresDates || hasDates) return false;
+  window.location.href = rentalsPath("checkout.html");
+  return true;
+}
+
 function init() {
+  if (enforceDateRangeBeforeShopping()) return;
   bindCartControls();
-  bindLocationToggle();
-  syncLocationToggle();
   bindOrderMetaForms();
   renderCategoryPage();
   renderProductPage();
   renderCheckoutPage();
+  renderSummaryPage();
   initCarousel();
   initCalendar();
+  initScrollReveal();
+  initCountUp();
+  initSocialProof();
   renderCart();
 }
 
 document.addEventListener("DOMContentLoaded", init);
+
+

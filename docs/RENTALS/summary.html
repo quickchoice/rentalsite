@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>QuickChoice Rental | Vacation Dates</title>
+  <title>QuickChoice Rental | Order Summary</title>
   <link rel="stylesheet" href="assets/styles.css" />
   <script defer src="assets/app.js"></script>
 </head>
-<body data-page="checkout">
+<body data-page="summary">
   <header class="utility-header">
     <button class="header-back" data-nav-back aria-label="Go back">←</button>
     <a class="header-logo-link" href="../index.html" aria-label="QuickChoice Rental home">
@@ -20,27 +20,21 @@
   </header>
 
   <main>
-    <section class="checkout-flow checkout-calendar-only">
+    <section class="checkout-flow">
       <div class="card checkout-step active">
-        <h2>When is your vacation?</h2>
-        <form data-order-meta-form>
-          <div class="calendar-card" data-calendar>
-            <div class="calendar-header">
-              <button type="button" class="icon-btn" data-cal-prev aria-label="Previous month">‹</button>
-              <div class="calendar-month" data-cal-month>February</div>
-              <button type="button" class="icon-btn" data-cal-next aria-label="Next month">›</button>
-            </div>
-            <div class="calendar-weekdays">
-              <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-            </div>
-            <div class="calendar-grid" data-cal-grid></div>
-            <div class="calendar-selected" data-cal-selected>Pick start and end dates</div>
-          </div>
-          <input type="hidden" name="startDate" required />
-          <input type="hidden" name="endDate" required />
-          <p class="form-error" data-form-error></p>
-          <button class="btn primary full" type="button" data-go-shopping>Start Shopping</button>
-        </form>
+        <h2>Order summary</h2>
+        <div class="summary-meta">
+          <div><strong>Dates Selected</strong><span data-summary-dates>—</span></div>
+        </div>
+        <div class="cart-items" data-cart-items></div>
+        <div class="subtotal-row">
+          <span>Subtotal</span>
+          <strong data-cart-subtotal>$0</strong>
+        </div>
+        <p class="muted small">Pricing reflects your selected dates.</p>
+        <p class="muted small">Payment handled securely by Stripe.</p>
+        <p class="form-error" data-checkout-error></p>
+        <button class="btn primary full" type="button" data-checkout-submit>Pay Now</button>
       </div>
     </section>
   </main>
@@ -64,6 +58,13 @@
     </div>
   </div>
   <div class="cart-backdrop" data-cart-backdrop aria-hidden="true"></div>
+
+  <script>
+    const STRIPE_PUBLISHABLE_KEY = "pk_test_REPLACE_ME";
+    async function startStripeCheckout(cart, orderMeta) {
+      // TODO: send cart + meta to backend to create Stripe Checkout session
+    }
+  </script>
 </body>
 </html>
 
