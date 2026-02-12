@@ -902,17 +902,42 @@ function initCountUp() {
   const counters = document.querySelectorAll("[data-count-to]");
   if (!counters.length) return;
   const ordered = Array.from(counters);
-  setTimeout(async () => {
-    for (const counter of ordered) {
-      await animateCounter(counter);
-      if ((counter.dataset.countKey || "") === "rating") {
-        await runStarSlam();
+  const isMobile = window.matchMedia("(max-width: 767px)").matches;
+  const startDelayMs = 300 + (isMobile ? 400 : 0);
+  let started = false;
+
+  const startSequence = () => {
+    if (started) return;
+    started = true;
+    setTimeout(async () => {
+      for (const counter of ordered) {
+        await animateCounter(counter);
+        if ((counter.dataset.countKey || "") === "rating") {
+          await runStarSlam();
+        }
+        if ((counter.dataset.countKey || "") === "speed") {
+          showClockSpin();
+        }
       }
-      if ((counter.dataset.countKey || "") === "speed") {
-        showClockSpin();
-      }
-    }
-  }, 300);
+    }, startDelayMs);
+  };
+
+  const triggerEl = document.querySelector(".stats-row") || ordered[0];
+  if (!triggerEl || !("IntersectionObserver" in window)) {
+    startSequence();
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries, obs) => {
+    const hit = entries.some(entry => entry.isIntersecting && entry.intersectionRatio >= 0.33);
+    if (!hit) return;
+    obs.disconnect();
+    startSequence();
+  }, {
+    threshold: [0, 0.33, 0.66, 1]
+  });
+
+  observer.observe(triggerEl);
 }
 
 function animateCounter(counter) {
