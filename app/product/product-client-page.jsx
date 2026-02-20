@@ -19,7 +19,7 @@ export default function ProductClientPage({ productId }) {
   const categoryName = categories.find(category => category.id === product.categoryId)?.name ?? 'Category';
 
   return (
-    <RentalsShell backHref={`/category?cat=${product.categoryId}`}>
+    <RentalsShell backHref={`/category/${product.categoryId}`}>
       <main>
         <section className={styles.layout}>
           <div className={styles.image} style={{ backgroundImage: `url(${product.imageUrl})` }} />
@@ -52,7 +52,7 @@ export default function ProductClientPage({ productId }) {
               <p className="muted">{product.longDescription}</p>
             </div>
 
-            <Link href={`/category?cat=${product.categoryId}`} className="btn btnSecondary">Back to category</Link>
+            <Link href={`/category/${product.categoryId}`} className="btn btnSecondary">Back to category</Link>
           </div>
         </section>
       </main>

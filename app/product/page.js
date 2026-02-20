@@ -1,8 +1,6 @@
 import ProductClientPage from '@/app/product/product-client-page';
+import { products } from '@/lib/data';
 
-export default async function ProductPage({ searchParams }) {
-  const params = await searchParams;
-  const productId = typeof params?.id === 'string' ? params.id : '';
-
-  return <ProductClientPage productId={productId} />;
+export default function ProductPage() {
+  return <ProductClientPage productId={products[0]?.id || ''} />;
 }

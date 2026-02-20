@@ -5,8 +5,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import styles from '@/components/UtilityHeader.module.css';
 import { useStore } from '@/context/StoreContext';
+import { withBasePath } from '@/lib/paths';
 
-export default function UtilityHeader({ backHref = '/category?cat=baby' }) {
+export default function UtilityHeader({ backHref = '/category/baby' }) {
   const router = useRouter();
   const { cartCount, setCartOpen } = useStore();
 
@@ -24,7 +25,7 @@ export default function UtilityHeader({ backHref = '/category?cat=baby' }) {
         ←
       </button>
       <Link className={styles.logoWrap} href="/" aria-label="QuickChoice Rental home">
-        <Image src="/rentals/visual/logo.png" alt="QuickChoice Rental" width={168} height={52} className={styles.logo} />
+        <Image src={withBasePath('/rentals/visual/logo.png')} alt="QuickChoice Rental" width={168} height={52} className={styles.logo} />
       </Link>
       <button className={styles.cart} type="button" onClick={() => setCartOpen(true)} aria-label="Open cart">
         <span>🛒</span>

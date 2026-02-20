@@ -5,8 +5,8 @@ This project is now structured as a Next.js App Router application.
 ## Routes
 - `/` landing scene with category zones
 - `/checkout` trip date selection
-- `/category?cat=baby|beach|access` category browsing and quick add
-- `/product?id=<product-id>` product details
+- `/category/baby` and `/category/beach` category browsing and quick add
+- `/product/<product-id>` product details
 - `/summary` order summary and checkout stub
 - `/empty-cart` empty cart fallback
 

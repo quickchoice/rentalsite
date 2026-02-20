@@ -9,7 +9,7 @@ export default function EmptyCartPage() {
         <section className={`${styles.card} card`}>
           <h1>Your cart is empty</h1>
           <p>Pick your dates and add rental items to continue.</p>
-          <Link href="/category?cat=baby" className="btn btnPrimary">Return to rental page</Link>
+          <Link href="/category/baby" className="btn btnPrimary">Return to rental page</Link>
         </section>
       </main>
     </RentalsShell>

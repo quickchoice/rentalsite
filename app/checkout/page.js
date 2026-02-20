@@ -51,7 +51,7 @@ export default function CheckoutPage() {
       return;
     }
     setError('');
-    router.push('/category?cat=baby');
+    router.push('/category/baby');
   }
 
   return (

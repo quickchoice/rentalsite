@@ -39,7 +39,7 @@ export default function CategoryClientPage({ categoryId }) {
               {categories.map(category => (
                 <Link
                   key={category.id}
-                  href={`/category?cat=${category.id}`}
+                  href={`/category/${category.id}`}
                   className={`${styles.tab} ${category.id === currentCategory.id ? styles.tabActive : ''}`}
                 >
                   {category.name}
@@ -84,7 +84,7 @@ export default function CategoryClientPage({ categoryId }) {
                 <p className={styles.price}>{formatMoney(item.pricePerDay)}/day</p>
                 <div className={styles.actions}>
                   <button type="button" className="btn btnPrimary" onClick={() => addToCart(item.id, 1)}>Quick add</button>
-                  <Link href={`/product?id=${item.id}`} className="btn btnSecondary">View details</Link>
+                  <Link href={`/product/${item.id}`} className="btn btnSecondary">View details</Link>
                 </div>
               </article>
             ))}
