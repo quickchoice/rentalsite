@@ -1,0 +1,100 @@
+.hero {
+  display: grid;
+  gap: 1.2rem;
+  padding: 1.2rem 0;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--accent);
+  font-family: var(--font-display);
+}
+
+.label {
+  margin-bottom: 0.35rem;
+  color: var(--text-muted);
+}
+
+.tabs {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tab {
+  border: 1px solid #7ca6c7;
+  background: linear-gradient(180deg, #f6fbff, #e2eff8);
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+  color: #245a8c;
+}
+
+.tabActive {
+  border-color: #c55b1c;
+  color: #934311;
+  background: linear-gradient(180deg, #ffd09f, #f4b06f);
+  font-weight: 700;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.filters input,
+.filters select {
+  border: 1px solid #d3bc92;
+  border-radius: 0.75rem;
+  background: rgba(255, 251, 244, 0.95);
+  padding: 0.75rem;
+}
+
+.sectionHeader {
+  margin-top: 0.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.grid {
+  margin: 1rem 0 1.75rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.itemCard {
+  padding: 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.image {
+  height: 9rem;
+  border-radius: var(--radius);
+  background: #eaf1f4 center / cover no-repeat;
+  border: 1px solid #dbc59d;
+}
+
+.price {
+  margin: 0;
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.actions :global(.btn) {
+  text-align: center;
+  white-space: nowrap;
+  font-size: clamp(0.68rem, 1.5vw, 0.88rem);
+  padding-inline: 0.5rem;
+}

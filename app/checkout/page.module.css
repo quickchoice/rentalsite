@@ -1,0 +1,73 @@
+.card {
+  margin-top: 1.5rem;
+  max-width: 42rem;
+  margin-inline: auto;
+  padding: 1.25rem;
+  display: grid;
+  gap: 1rem;
+  border: 1px solid #d2bb8e;
+  background: linear-gradient(180deg, rgba(255, 250, 241, 0.96), rgba(249, 236, 210, 0.94));
+}
+
+.calendar {
+  border: 1px solid #d6bf93;
+  border-radius: var(--radius);
+  background: rgba(255, 248, 233, 0.92);
+  padding: 1rem;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.weekdays,
+.grid {
+  margin-top: 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+  text-align: center;
+}
+
+.weekdays {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.empty {
+  height: 2.4rem;
+}
+
+.day {
+  height: 2.4rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.range {
+  background: rgba(61, 129, 184, 0.24);
+}
+
+.start {
+  background: #1f5b96;
+  color: #fff;
+}
+
+.end {
+  background: #fff9ed;
+  border: 2px solid #c98245;
+}
+
+.selected {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.error {
+  margin: 0;
+  color: #9d4747;
+}

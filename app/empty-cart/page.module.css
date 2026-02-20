@@ -1,0 +1,15 @@
+.card {
+  margin-top: 3rem;
+  max-width: 34rem;
+  margin-inline: auto;
+  padding: 1.4rem;
+  text-align: center;
+  display: grid;
+  gap: 0.9rem;
+  border: 1px solid #d2bb8e;
+  background: linear-gradient(180deg, rgba(255, 250, 241, 0.96), rgba(249, 236, 210, 0.94));
+}
+
+.card h1 {
+  margin: 0;
+}
