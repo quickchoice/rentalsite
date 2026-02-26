@@ -1,24 +1,54 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import RentalsShell from '@/components/RentalsShell';
 import styles from '@/app/summary/page.module.css';
 import { useStore } from '@/context/StoreContext';
 import { formatMoney, getDayCount, getProductById } from '@/lib/cart';
+import { withBasePath } from '@/lib/paths';
 
 export default function SummaryPage() {
   const { cart, orderMeta, subtotal } = useStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [wasCanceled, setWasCanceled] = useState(false);
   const days = getDayCount(orderMeta);
 
-  function onPayNow() {
+  useEffect(() => {
+    const canceled = new URLSearchParams(window.location.search).get('canceled') === '1';
+    setWasCanceled(canceled);
+  }, []);
+
+  async function onPayNow() {
     if (!orderMeta.startDate || !orderMeta.endDate) {
-      alert('Please add trip dates before paying.');
+      setError('Please add trip dates before paying.');
       return;
     }
     if (!cart.length) {
-      alert('Your cart is empty.');
+      setError('Your cart is empty.');
       return;
     }
-    alert('Stripe checkout stub. Connect your backend endpoint here.');
+
+    setError('');
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch(withBasePath('/api/checkout-session'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cart, orderMeta })
+      });
+
+      const data = await response.json();
+      if (!response.ok || !data?.url) {
+        throw new Error(data?.error || 'Could not start checkout.');
+      }
+
+      window.location.assign(data.url);
+    } catch (checkoutError) {
+      setError(checkoutError.message || 'Could not start checkout.');
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -27,6 +57,7 @@ export default function SummaryPage() {
         <section className={`${styles.card} card`}>
           <h1>Order Summary</h1>
           <p className="muted">Dates selected: {orderMeta.startDate && orderMeta.endDate ? `${orderMeta.startDate} → ${orderMeta.endDate}` : '—'}</p>
+          {wasCanceled && <p className={styles.notice}>Checkout was canceled. Your cart is still saved.</p>}
 
           <div className={styles.lines}>
             {!cart.length && <p className="muted">Your cart is empty.</p>}
@@ -47,8 +78,11 @@ export default function SummaryPage() {
           </div>
 
           <div className={styles.subtotal}><span>Subtotal</span><strong>{formatMoney(subtotal)}</strong></div>
-          <p className="muted">Payment handled securely by Stripe once backend checkout session is connected.</p>
-          <button type="button" className="btn btnPrimary" onClick={onPayNow}>Pay Now</button>
+          <p className="muted">Secure checkout is handled by Stripe.</p>
+          {error && <p className={styles.error}>{error}</p>}
+          <button type="button" className="btn btnPrimary" onClick={onPayNow} disabled={isSubmitting}>
+            {isSubmitting ? 'Redirecting...' : 'Pay Now'}
+          </button>
         </section>
       </main>
     </RentalsShell>

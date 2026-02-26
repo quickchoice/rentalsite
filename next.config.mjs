@@ -1,10 +1,10 @@
 /** @type {import('next').NextConfig} */
-const isGithubActions = process.env.GITHUB_ACTIONS === 'true';
-const repositoryName = process.env.GITHUB_REPOSITORY?.split('/')[1] || 'rentalsite';
-const basePath = isGithubActions ? `/${repositoryName}` : '';
+const isStaticExport = process.env.NEXT_EXPORT === 'true';
+const rawBasePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+const basePath = rawBasePath && rawBasePath !== '/' ? rawBasePath : '';
 
 const nextConfig = {
-  output: 'export',
+  ...(isStaticExport ? { output: 'export' } : {}),
   trailingSlash: true,
   basePath,
   assetPrefix: basePath ? `${basePath}/` : undefined,

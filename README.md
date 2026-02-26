@@ -2,12 +2,18 @@
 
 This project is now structured as a Next.js App Router application.
 
+## Stripe Checkout Status
+- `/summary` now creates a real Stripe Checkout Session through `POST /api/checkout-session`.
+- `/checkout/success` is the payment success return page and clears the cart.
+- The server calculates pricing from `lib/data.js` (price/day x qty x rental days), so client-side price tampering is ignored.
+
 ## Routes
 - `/` landing scene with category zones
 - `/checkout` trip date selection
 - `/category/baby` and `/category/beach` category browsing and quick add
 - `/product/<product-id>` product details
-- `/summary` order summary and checkout stub
+- `/summary` order summary + Stripe checkout redirect
+- `/checkout/success` Stripe success return
 - `/empty-cart` empty cart fallback
 
 ## Project Structure
@@ -19,7 +25,34 @@ This project is now structured as a Next.js App Router application.
 - `lib/cart.js`: shared cart/date/math helpers
 - `public/rentals`: static rental assets
 
-## Notes
+## Deploy + Setup (Exact Steps)
+1. Stripe: Create or log in to your Stripe account.
+2. Stripe: Open `Developers -> API keys`.
+3. Stripe: Copy your **Secret key** (starts with `sk_test_` for test mode).
+4. Local dev: create `.env.local` in the project root with:
+
+```bash
+STRIPE_SECRET_KEY=sk_test_your_key_here
+NEXT_PUBLIC_BASE_PATH=
+```
+
+5. Install and run locally:
+
+```bash
+npm install
+npm run dev
+```
+
+6. Open `http://localhost:3000`, add items to cart, go to summary, click `Pay Now`.
+7. In Stripe test mode, use card `4242 4242 4242 4242` with any future date/CVC/ZIP.
+8. Vercel: Import this GitHub repo as a new Vercel project.
+9. Vercel: In project settings, add env var `STRIPE_SECRET_KEY` (Production + Preview).
+10. Vercel: Keep `NEXT_PUBLIC_BASE_PATH` empty unless you intentionally deploy under a subpath.
+11. Vercel: Deploy. Use your Vercel domain for live checkout.
+
+## Important Notes
+- GitHub Pages is static-only and cannot safely run Stripe secret-key server code.
+- This repo now supports server-side Stripe session creation for Vercel/Node hosting.
+- You do **not** need to manually create Stripe products for this implementation; items are sent dynamically from your existing catalog in `lib/data.js`.
 - Legacy static files remain in `docs/` for reference.
 - `vending` content was left untouched.
-- Stripe checkout is still a frontend stub (`/summary`) and needs backend session creation wiring.
