@@ -33,6 +33,21 @@
   font-size: 1.1rem;
 }
 
+.promoField {
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  color: #3a311e;
+}
+
+.promoField input {
+  border: 1px solid #d8c39b;
+  border-radius: 0.55rem;
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+  background: #fffdf8;
+}
+
 .notice {
   margin: 0;
   padding: 0.65rem 0.8rem;

@@ -12,6 +12,7 @@ export default function SummaryPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [wasCanceled, setWasCanceled] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
   const days = getDayCount(orderMeta);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function SummaryPage() {
       const response = await fetch(withBasePath('/api/checkout-session'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cart, orderMeta })
+        body: JSON.stringify({ cart, orderMeta, promoCode })
       });
 
       const data = await response.json();
@@ -78,6 +79,16 @@ export default function SummaryPage() {
           </div>
 
           <div className={styles.subtotal}><span>Subtotal</span><strong>{formatMoney(subtotal)}</strong></div>
+          <label className={styles.promoField}>
+            Promo code (optional)
+            <input
+              type="text"
+              value={promoCode}
+              onChange={event => setPromoCode(event.target.value)}
+              placeholder="Enter promo code"
+              autoComplete="off"
+            />
+          </label>
           <p className="muted">Secure checkout is handled by Stripe.</p>
           {error && <p className={styles.error}>{error}</p>}
           <button type="button" className="btn btnPrimary" onClick={onPayNow} disabled={isSubmitting}>

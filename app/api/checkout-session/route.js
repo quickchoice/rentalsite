@@ -4,6 +4,13 @@ import { products } from '@/lib/data';
 
 const productById = new Map(products.map(product => [product.id, product]));
 const MAX_QTY_PER_LINE = 25;
+const DISCOUNT_PERCENT = 99;
+const DISCOUNT_MULTIPLIER = (100 - DISCOUNT_PERCENT) / 100;
+
+function normalizePromoCode(value) {
+  if (typeof value !== 'string') return '';
+  return value.trim().toUpperCase();
+}
 
 function sanitizeCart(cart) {
   if (!Array.isArray(cart)) return [];
@@ -23,7 +30,7 @@ function sanitizeCart(cart) {
   }));
 }
 
-function buildStripeCheckoutParams({ lineItems, orderMeta, dayCount, origin }) {
+function buildStripeCheckoutParams({ lineItems, orderMeta, dayCount, origin, promoApplied }) {
   const params = new URLSearchParams();
 
   params.set('mode', 'payment');
@@ -33,6 +40,10 @@ function buildStripeCheckoutParams({ lineItems, orderMeta, dayCount, origin }) {
   params.set('metadata[start_date]', orderMeta.startDate);
   params.set('metadata[end_date]', orderMeta.endDate);
   params.set('metadata[day_count]', String(dayCount));
+  params.set('metadata[promo_applied]', promoApplied ? 'true' : 'false');
+  if (promoApplied) {
+    params.set('metadata[promo_discount_percent]', String(DISCOUNT_PERCENT));
+  }
 
   lineItems.forEach((lineItem, index) => {
     params.set(`line_items[${index}][quantity]`, String(lineItem.qty));
@@ -69,6 +80,14 @@ export async function POST(request) {
   }
 
   const orderMeta = payload?.orderMeta || {};
+  const enteredPromoCode = normalizePromoCode(payload?.promoCode);
+  const expectedPromoCode = normalizePromoCode(process.env.CHECKOUT_PROMO_CODE_99);
+  const promoApplied = Boolean(
+    enteredPromoCode &&
+    expectedPromoCode &&
+    enteredPromoCode === expectedPromoCode
+  );
+
   const start = parseDateLocal(orderMeta.startDate);
   const end = parseDateLocal(orderMeta.endDate);
   if (!start || !end || end < start) {
@@ -87,12 +106,16 @@ export async function POST(request) {
   const lineItems = cart.map(line => {
     const product = productById.get(line.productId);
     if (!product) return null;
+    const baseUnitAmountCents = Math.round(product.pricePerDay * dayCount * 100);
+    const unitAmountCents = promoApplied
+      ? Math.max(1, Math.round(baseUnitAmountCents * DISCOUNT_MULTIPLIER))
+      : baseUnitAmountCents;
 
     return {
       productId: product.id,
       name: product.name,
       qty: line.qty,
-      unitAmountCents: Math.round(product.pricePerDay * dayCount * 100),
+      unitAmountCents,
       pricePerDayLabel: `$${product.pricePerDay}`
     };
   }).filter(Boolean);
@@ -102,7 +125,13 @@ export async function POST(request) {
   }
 
   const origin = request.headers.get('origin') || request.nextUrl.origin;
-  const params = buildStripeCheckoutParams({ lineItems, orderMeta, dayCount, origin });
+  const params = buildStripeCheckoutParams({
+    lineItems,
+    orderMeta,
+    dayCount,
+    origin,
+    promoApplied
+  });
 
   let stripeResponse;
   try {
