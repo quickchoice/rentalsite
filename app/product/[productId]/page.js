@@ -5,6 +5,7 @@ export function generateStaticParams() {
   return products.map(product => ({ productId: product.id }));
 }
 
-export default function ProductByIdPage({ params }) {
-  return <ProductClientPage productId={params.productId} />;
+export default async function ProductByIdPage({ params }) {
+  const { productId } = await params;
+  return <ProductClientPage productId={productId} />;
 }
