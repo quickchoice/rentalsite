@@ -1,5 +1,6 @@
 import './globals.css';
 import Providers from '@/app/providers';
+import { Analytics } from '@vercel/analytics/next';
 import { withBasePath } from '@/lib/paths';
 
 export const metadata = {
@@ -14,6 +15,7 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning style={{ '--app-bg-image': appBackgroundImage }}>
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   );
