@@ -33,6 +33,10 @@ This project is now structured as a Next.js App Router application.
 
 ```bash
 STRIPE_SECRET_KEY=sk_test_your_key_here
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
+RESEND_API_KEY=re_your_resend_api_key
+RESEND_FROM_EMAIL=orders@yourdomain.com
+ORDER_NOTIFY_EMAIL=dante.smith@quickchoice.net
 NEXT_PUBLIC_BASE_PATH=
 ```
 
@@ -49,10 +53,15 @@ npm run dev
 9. Vercel: In project settings, add env var `STRIPE_SECRET_KEY` (Production + Preview).
 10. Vercel: Keep `NEXT_PUBLIC_BASE_PATH` empty unless you intentionally deploy under a subpath.
 11. Vercel: Deploy. Use your Vercel domain for live checkout.
+12. Stripe: Add a webhook endpoint to `https://<your-domain>/api/stripe-webhook` and subscribe to `checkout.session.completed`.
+13. Stripe: Copy the webhook signing secret into `STRIPE_WEBHOOK_SECRET` in Vercel.
+14. Vercel: Add `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and `ORDER_NOTIFY_EMAIL` env vars so paid checkouts email Dante + the customer.
+15. Vercel Postgres (or Neon via Vercel integration): connect a database so webhook inserts are stored in `rental_transactions`.
 
 ## Important Notes
 - GitHub Pages is static-only and cannot safely run Stripe secret-key server code.
 - This repo now supports server-side Stripe session creation for Vercel/Node hosting.
+- Paid checkout summaries are sent from the webhook to Dante + the customer and stored in `rental_transactions`.
 - You do **not** need to manually create Stripe products for this implementation; items are sent dynamically from your existing catalog in `lib/data.js`.
 - Legacy static files remain in `docs/` for reference.
 - `vending` content was left untouched.

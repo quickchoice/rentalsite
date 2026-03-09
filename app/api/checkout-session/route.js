@@ -34,6 +34,7 @@ function buildStripeCheckoutParams({ lineItems, orderMeta, dayCount, origin, pro
   const params = new URLSearchParams();
 
   params.set('mode', 'payment');
+  params.set('customer_creation', 'always');
   params.set('success_url', `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`);
   params.set('cancel_url', `${origin}/summary?canceled=1`);
   params.set('allow_promotion_codes', 'true');
