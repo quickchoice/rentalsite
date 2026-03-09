@@ -191,14 +191,24 @@ export async function POST(request) {
   });
 
   if (resendApiKey && resendFromEmail) {
-    await sendTransactionSummaryEmail({
-      resendApiKey,
-      fromEmail: resendFromEmail,
-      danteEmail: process.env.ORDER_NOTIFY_EMAIL || DEFAULT_NOTIFY_EMAIL,
-      customerEmail,
-      subject: `QuickChoice receipt: ${formatMoneyFromCents(amountTotal, currency)} (${sessionId})`,
-      bodyText
-    });
+    try {
+      const emailResults = await sendTransactionSummaryEmail({
+        resendApiKey,
+        fromEmail: resendFromEmail,
+        danteEmail: process.env.ORDER_NOTIFY_EMAIL || DEFAULT_NOTIFY_EMAIL,
+        customerEmail,
+        subject: `QuickChoice receipt: ${formatMoneyFromCents(amountTotal, currency)} (${sessionId})`,
+        bodyText
+      });
+
+      emailResults
+        .filter(result => !result.ok)
+        .forEach(result => {
+          console.error(`Email delivery failed for ${result.toEmail}: ${result.error}`);
+        });
+    } catch (error) {
+      console.error('Unexpected email dispatch error:', error);
+    }
   }
 
   return NextResponse.json({ received: true });

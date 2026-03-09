@@ -108,6 +108,7 @@ export async function POST(request) {
     const product = productById.get(line.productId);
     if (!product) return null;
     const baseUnitAmountCents = Math.round(product.pricePerDay * dayCount * 100);
+    if (baseUnitAmountCents <= 0) return null;
     const unitAmountCents = promoApplied
       ? Math.max(1, Math.round(baseUnitAmountCents * DISCOUNT_MULTIPLIER))
       : baseUnitAmountCents;
@@ -122,7 +123,10 @@ export async function POST(request) {
   }).filter(Boolean);
 
   if (!lineItems.length) {
-    return NextResponse.json({ error: 'No valid cart items found.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Cart only contains free items. Add at least one paid item to checkout.' },
+      { status: 400 }
+    );
   }
 
   const origin = request.headers.get('origin') || request.nextUrl.origin;
