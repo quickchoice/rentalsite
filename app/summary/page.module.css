@@ -48,6 +48,16 @@
   background: #fffdf8;
 }
 
+.promoNote {
+  margin: 0;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.55rem;
+  border: 1px solid #d9c48b;
+  background: #fff8e6;
+  color: #5b4c27;
+  font-size: 0.88rem;
+}
+
 .notice {
   margin: 0;
   padding: 0.65rem 0.8rem;

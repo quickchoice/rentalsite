@@ -111,6 +111,29 @@
   font-size: 0.92rem;
 }
 
+.locationRow {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.locationBtn {
+  border: 1px solid #2f6d9f;
+  border-radius: 999px;
+  background: #f2f9ff;
+  color: #1f4f7a;
+  font-weight: 800;
+  padding: 0.28rem 0.65rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.locationBtnActive {
+  background: linear-gradient(180deg, #2e6ea2, #1d537f);
+  border-color: #123c63;
+  color: #fff;
+}
+
 .dateFields {
   display: grid;
   grid-template-columns: 1fr 1fr;

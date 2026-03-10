@@ -6,6 +6,8 @@ import { products } from '@/lib/data';
 
 const ORDER_META_KEY = 'qc_order_meta';
 const CART_KEY = 'qc_cart';
+const DEFAULT_ORDER_META = { startDate: '', endDate: '', location: '' };
+const validLocations = new Set(['charleston', 'myrtle-beach']);
 
 const StoreContext = createContext(null);
 const validProductIds = new Set(products.map(product => product.id));
@@ -26,21 +28,31 @@ function readJson(key, fallback) {
   }
 }
 
+function sanitizeOrderMeta(orderMeta) {
+  const next = orderMeta && typeof orderMeta === 'object' ? orderMeta : {};
+  const location = validLocations.has(next.location) ? next.location : '';
+  return {
+    startDate: typeof next.startDate === 'string' ? next.startDate : '',
+    endDate: typeof next.endDate === 'string' ? next.endDate : '',
+    location
+  };
+}
+
 export function StoreProvider({ children }) {
   const [ready, setReady] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
-  const [orderMeta, setOrderMeta] = useState({ startDate: '', endDate: '' });
+  const [orderMeta, setOrderMeta] = useState(DEFAULT_ORDER_META);
   const [cart, setCart] = useState([]);
 
   useEffect(() => {
-    setOrderMeta(readJson(ORDER_META_KEY, { startDate: '', endDate: '' }));
+    setOrderMeta(sanitizeOrderMeta(readJson(ORDER_META_KEY, DEFAULT_ORDER_META)));
     setCart(sanitizeCart(readJson(CART_KEY, [])));
     setReady(true);
   }, []);
 
   useEffect(() => {
     if (!ready) return;
-    localStorage.setItem(ORDER_META_KEY, JSON.stringify(orderMeta));
+    localStorage.setItem(ORDER_META_KEY, JSON.stringify(sanitizeOrderMeta(orderMeta)));
   }, [ready, orderMeta]);
 
   useEffect(() => {
@@ -58,6 +70,10 @@ export function StoreProvider({ children }) {
       setCartOpen,
       orderMeta,
       setOrderMeta,
+      setLocation(location) {
+        if (!validLocations.has(location)) return;
+        setOrderMeta(prev => ({ ...sanitizeOrderMeta(prev), location }));
+      },
       cart,
       cartCount,
       subtotal,

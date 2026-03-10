@@ -4,8 +4,9 @@ import { products } from '@/lib/data';
 
 const productById = new Map(products.map(product => [product.id, product]));
 const MAX_QTY_PER_LINE = 25;
-const DISCOUNT_PERCENT = 99;
+const DISCOUNT_PERCENT = 20;
 const DISCOUNT_MULTIPLIER = (100 - DISCOUNT_PERCENT) / 100;
+const validLocations = new Set(['charleston', 'myrtle-beach']);
 
 function normalizePromoCode(value) {
   if (typeof value !== 'string') return '';
@@ -40,6 +41,7 @@ function buildStripeCheckoutParams({ lineItems, orderMeta, dayCount, origin, pro
   params.set('allow_promotion_codes', 'true');
   params.set('metadata[start_date]', orderMeta.startDate);
   params.set('metadata[end_date]', orderMeta.endDate);
+  params.set('metadata[location]', orderMeta.location);
   params.set('metadata[day_count]', String(dayCount));
   params.set('metadata[promo_applied]', promoApplied ? 'true' : 'false');
   if (promoApplied) {
@@ -82,7 +84,9 @@ export async function POST(request) {
 
   const orderMeta = payload?.orderMeta || {};
   const enteredPromoCode = normalizePromoCode(payload?.promoCode);
-  const expectedPromoCode = normalizePromoCode(process.env.CHECKOUT_PROMO_CODE_99);
+  const expectedPromoCode = normalizePromoCode(
+    process.env.CHECKOUT_PROMO_CODE || process.env.CHECKOUT_PROMO_CODE_99
+  );
   const promoApplied = Boolean(
     enteredPromoCode &&
     expectedPromoCode &&
@@ -91,6 +95,13 @@ export async function POST(request) {
 
   const start = parseDateLocal(orderMeta.startDate);
   const end = parseDateLocal(orderMeta.endDate);
+  const location = typeof orderMeta.location === 'string' ? orderMeta.location : '';
+  if (!validLocations.has(location)) {
+    return NextResponse.json(
+      { error: 'Select Charleston or Myrtle Beach before checkout.' },
+      { status: 400 }
+    );
+  }
   if (!start || !end || end < start) {
     return NextResponse.json(
       { error: 'Invalid rental dates. Please select a valid date range.' },
@@ -132,7 +143,7 @@ export async function POST(request) {
   const origin = request.headers.get('origin') || request.nextUrl.origin;
   const params = buildStripeCheckoutParams({
     lineItems,
-    orderMeta,
+    orderMeta: { ...orderMeta, location },
     dayCount,
     origin,
     promoApplied

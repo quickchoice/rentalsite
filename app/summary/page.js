@@ -5,6 +5,7 @@ import RentalsShell from '@/components/RentalsShell';
 import styles from '@/app/summary/page.module.css';
 import { useStore } from '@/context/StoreContext';
 import { formatMoney, getDayCount, getProductById } from '@/lib/cart';
+import { locations } from '@/lib/data';
 import { withBasePath } from '@/lib/paths';
 
 export default function SummaryPage() {
@@ -14,6 +15,7 @@ export default function SummaryPage() {
   const [wasCanceled, setWasCanceled] = useState(false);
   const [promoCode, setPromoCode] = useState('');
   const days = getDayCount(orderMeta);
+  const locationName = locations.find(location => location.id === orderMeta.location)?.name || 'Not selected';
 
   useEffect(() => {
     const canceled = new URLSearchParams(window.location.search).get('canceled') === '1';
@@ -23,6 +25,10 @@ export default function SummaryPage() {
   async function onPayNow() {
     if (!orderMeta.startDate || !orderMeta.endDate) {
       setError('Please add trip dates before paying.');
+      return;
+    }
+    if (!orderMeta.location) {
+      setError('Please select Charleston or Myrtle Beach before paying.');
       return;
     }
     if (!cart.length) {
@@ -57,6 +63,7 @@ export default function SummaryPage() {
       <main>
         <section className={`${styles.card} card`}>
           <h1>Order Summary</h1>
+          <p className="muted">Service area: {locationName}</p>
           <p className="muted">Dates selected: {orderMeta.startDate && orderMeta.endDate ? `${orderMeta.startDate} → ${orderMeta.endDate}` : '—'}</p>
           {wasCanceled && <p className={styles.notice}>Checkout was canceled. Your cart is still saved.</p>}
 
@@ -89,6 +96,7 @@ export default function SummaryPage() {
               autoComplete="off"
             />
           </label>
+          <p className={styles.promoNote}>Standard site pricing reflects a 10% market discount. Active promo codes apply an additional 20% off.</p>
           <p className="muted">Secure checkout is handled by Stripe.</p>
           {error && <p className={styles.error}>{error}</p>}
           <button type="button" className="btn btnPrimary" onClick={onPayNow} disabled={isSubmitting}>

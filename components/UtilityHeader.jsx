@@ -22,10 +22,13 @@ export default function UtilityHeader({ backHref = '/category/baby' }) {
   return (
     <header className={styles.header}>
       <button className={styles.back} type="button" onClick={handleBack} aria-label="Go back">
-        ←
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19 12H5" />
+          <path d="M11 6L5 12L11 18" />
+        </svg>
       </button>
-      <Link className={styles.logoWrap} href="/" aria-label="QuickChoice Rental home">
-        <Image src={withBasePath('/rentals/visual/logo.png')} alt="QuickChoice Rental" width={168} height={52} className={styles.logo} />
+      <Link className={styles.logoWrap} href="/" aria-label="QuickChoice Rentals home">
+        <Image src={withBasePath('/rentals/visual/logo.png')} alt="QuickChoice Rentals" width={168} height={52} className={styles.logo} />
       </Link>
       <button className={styles.cart} type="button" onClick={() => setCartOpen(true)} aria-label="Open cart">
         <span>🛒</span>

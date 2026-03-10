@@ -16,6 +16,28 @@
   padding: 1rem;
 }
 
+.locationRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.locationBtn {
+  border: 1px solid #2f6d9f;
+  border-radius: 999px;
+  background: #f2f9ff;
+  color: #1f4f7a;
+  font-weight: 800;
+  padding: 0.45rem 0.8rem;
+  cursor: pointer;
+}
+
+.locationBtnActive {
+  background: linear-gradient(180deg, #2e6ea2, #1d537f);
+  border-color: #123c63;
+  color: #fff;
+}
+
 .head {
   display: flex;
   justify-content: space-between;

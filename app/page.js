@@ -4,6 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import styles from '@/app/page.module.css';
+import { useStore } from '@/context/StoreContext';
+import { locations } from '@/lib/data';
 import { withBasePath } from '@/lib/paths';
 
 const navLinks = [
@@ -30,9 +32,12 @@ const carouselImages = [
 ];
 
 export default function HomePage() {
+  const { orderMeta, setLocation } = useStore();
   const [slideIndex, setSlideIndex] = useState(0);
   const [isTransitionEnabled, setIsTransitionEnabled] = useState(true);
   const slides = [...carouselImages, carouselImages[0]];
+
+  const activeLocation = orderMeta.location || locations[0].id;
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -55,10 +60,10 @@ export default function HomePage() {
   return (
     <main className={styles.page}>
       <header className={styles.topNav}>
-        <Link href="/" className={styles.logoWrap} aria-label="QuickChoice Rental home">
+        <Link href="/" className={styles.logoWrap} aria-label="QuickChoice Rentals home">
           <Image
             src={withBasePath('/rentals/visual/logo.png')}
-            alt="QuickChoice Rental"
+            alt="QuickChoice Rentals"
             width={210}
             height={62}
             className={styles.logo}
@@ -102,12 +107,28 @@ export default function HomePage() {
         </p>
 
         <div className={styles.ctaRow}>
-          <Link href="/category/baby" className={`${styles.cta} ${styles.ctaPrimary}`}>
+          <Link href={`/category/baby?location=${activeLocation}`} className={`${styles.cta} ${styles.ctaPrimary}`}>
             Browse Baby Gear
           </Link>
-          <Link href="/category/beach" className={`${styles.cta} ${styles.ctaSecondary}`}>
+          <Link href={`/category/beach?location=${activeLocation}`} className={`${styles.cta} ${styles.ctaSecondary}`}>
             Browse Beach Gear
           </Link>
+        </div>
+
+        <div className={styles.locationPicker}>
+          <p>Select your service area</p>
+          <div className={styles.locationButtons}>
+            {locations.map(location => (
+              <button
+                key={location.id}
+                type="button"
+                className={`${styles.locationBtn} ${activeLocation === location.id ? styles.locationBtnActive : ''}`}
+                onClick={() => setLocation(location.id)}
+              >
+                {location.name}
+              </button>
+            ))}
+          </div>
         </div>
 
         <ul className={styles.trustRow}>

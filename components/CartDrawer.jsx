@@ -4,6 +4,7 @@ import Link from 'next/link';
 import styles from '@/components/CartDrawer.module.css';
 import { useStore } from '@/context/StoreContext';
 import { formatMoney, getDayCount, getProductById } from '@/lib/cart';
+import { locations } from '@/lib/data';
 
 export default function CartDrawer() {
   const {
@@ -13,14 +14,18 @@ export default function CartDrawer() {
     subtotal,
     orderMeta,
     setOrderMeta,
+    setLocation,
     updateQty,
     removeFromCart
   } = useStore();
 
   const dayCount = getDayCount(orderMeta);
   const hasSelectedDates = Boolean(orderMeta.startDate && orderMeta.endDate);
+  const hasSelectedLocation = Boolean(orderMeta.location);
   const needsDates = cart.length > 0 && !hasSelectedDates;
-  const checkoutHref = cart.length ? (hasSelectedDates ? '/summary' : '#') : '/empty-cart';
+  const needsLocation = cart.length > 0 && !hasSelectedLocation;
+  const cannotCheckout = needsDates || needsLocation;
+  const checkoutHref = cart.length ? (hasSelectedDates && hasSelectedLocation ? '/summary' : '#') : '/empty-cart';
   const dateLabel = orderMeta.startDate && orderMeta.endDate ? `${orderMeta.startDate} → ${orderMeta.endDate} (${dayCount} days)` : '—';
 
   const dailySubtotal = cart.reduce((sum, line) => {
@@ -79,6 +84,20 @@ export default function CartDrawer() {
         </div>
 
         <div className={styles.meta}>
+          <strong>Service Area</strong>
+          <div className={styles.locationRow}>
+            {locations.map(location => (
+              <button
+                key={location.id}
+                type="button"
+                className={`${styles.locationBtn} ${orderMeta.location === location.id ? styles.locationBtnActive : ''}`}
+                onClick={() => setLocation(location.id)}
+              >
+                {location.name}
+              </button>
+            ))}
+          </div>
+
           <strong>Trip Dates</strong>
           <div className={styles.dateFields}>
             <label>
@@ -98,10 +117,10 @@ export default function CartDrawer() {
           <div className={styles.subtotal}><span>Trip total</span><strong>{formatMoney(subtotal)}</strong></div>
           <Link
             href={checkoutHref}
-            className={`${styles.checkout} ${needsDates ? styles.checkoutDisabled : ''}`}
-            aria-disabled={needsDates}
+            className={`${styles.checkout} ${cannotCheckout ? styles.checkoutDisabled : ''}`}
+            aria-disabled={cannotCheckout}
             onClick={event => {
-              if (needsDates) {
+              if (cannotCheckout) {
                 event.preventDefault();
                 return;
               }
@@ -110,7 +129,15 @@ export default function CartDrawer() {
           >
             Checkout
           </Link>
-          {needsDates && <p className={styles.checkoutHint}>Select start and end dates to continue.</p>}
+          {cannotCheckout && (
+            <p className={styles.checkoutHint}>
+              {needsLocation && needsDates
+                ? 'Select Charleston or Myrtle Beach, then choose trip dates.'
+                : needsLocation
+                ? 'Select Charleston or Myrtle Beach.'
+                : 'Select start and end dates to continue.'}
+            </p>
+          )}
         </div>
       </aside>
 

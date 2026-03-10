@@ -6,6 +6,7 @@ import RentalsShell from '@/components/RentalsShell';
 import styles from '@/app/checkout/page.module.css';
 import { formatDateLocal, parseDateLocal } from '@/lib/cart';
 import { useStore } from '@/context/StoreContext';
+import { locations } from '@/lib/data';
 
 function getCalendarDays(viewDate) {
   const year = viewDate.getFullYear();
@@ -17,7 +18,7 @@ function getCalendarDays(viewDate) {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { orderMeta, setOrderMeta } = useStore();
+  const { orderMeta, setOrderMeta, setLocation } = useStore();
   const [viewDate, setViewDate] = useState(null);
   const [error, setError] = useState('');
 
@@ -38,14 +39,18 @@ export default function CheckoutPage() {
     const value = formatDateLocal(date);
 
     if (!start || (start && end) || date < start) {
-      setOrderMeta({ startDate: value, endDate: '' });
+      setOrderMeta(prev => ({ ...prev, startDate: value, endDate: '' }));
       return;
     }
 
-    setOrderMeta({ ...orderMeta, endDate: value });
+    setOrderMeta(prev => ({ ...prev, endDate: value }));
   }
 
   function startShopping() {
+    if (!orderMeta.location) {
+      setError('Please select Charleston or Myrtle Beach.');
+      return;
+    }
     if (!orderMeta.startDate || !orderMeta.endDate) {
       setError('Please select a start and end date.');
       return;
@@ -59,6 +64,18 @@ export default function CheckoutPage() {
       <main>
         <section className={`${styles.card} card`}>
           <h1>When is your vacation?</h1>
+          <div className={styles.locationRow}>
+            {locations.map(location => (
+              <button
+                key={location.id}
+                type="button"
+                className={`${styles.locationBtn} ${orderMeta.location === location.id ? styles.locationBtnActive : ''}`}
+                onClick={() => setLocation(location.id)}
+              >
+                {location.name}
+              </button>
+            ))}
+          </div>
           <div className={styles.calendar}>
             <div className={styles.head}>
               <button type="button" className="btn btnSecondary" onClick={() => viewDate && setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1))}>‹</button>
