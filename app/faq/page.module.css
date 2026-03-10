@@ -1,0 +1,46 @@
+.card {
+  margin-top: 1.4rem;
+  max-width: 52rem;
+  margin-inline: auto;
+  padding: 1.25rem;
+  display: grid;
+  gap: 1rem;
+  border: 1px solid #d2bb8e;
+  background: linear-gradient(180deg, rgba(255, 250, 241, 0.96), rgba(249, 236, 210, 0.94));
+}
+
+.card h1 {
+  margin: 0;
+}
+
+.thread {
+  display: grid;
+  gap: 0.95rem;
+}
+
+.pair {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.bubble {
+  margin: 0;
+  max-width: 86%;
+  border-radius: 1rem;
+  padding: 0.65rem 0.85rem;
+  line-height: 1.35;
+  border: 1px solid #d8c39b;
+}
+
+.question {
+  justify-self: end;
+  background: linear-gradient(180deg, #5eabd1, #3f87b8);
+  color: #f4fbff;
+  border-color: #2f6d9f;
+}
+
+.answer {
+  justify-self: start;
+  background: #fff9ef;
+  color: #324557;
+}

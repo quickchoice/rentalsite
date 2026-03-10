@@ -37,6 +37,11 @@
   height: 2.1rem;
   line-height: 1;
   color: #2b6094;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.close:active {
+  transform: translateY(2px) scale(0.97);
 }
 
 .lines {
@@ -84,6 +89,11 @@
   background: linear-gradient(180deg, #fffdf9, #f5ebd7);
   padding: 0.2rem 0.5rem;
   cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.actions button:active {
+  transform: translateY(1px) scale(0.98);
 }
 
 .muted {
@@ -141,6 +151,25 @@
   text-align: center;
   font-weight: 700;
   padding: 0.75rem;
+  transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+  box-shadow: 0 8px 18px rgba(17, 35, 57, 0.22);
+}
+
+.checkout:active {
+  transform: translateY(2px) scale(0.985);
+  box-shadow: 0 4px 10px rgba(17, 35, 57, 0.2);
+}
+
+.checkoutDisabled {
+  filter: grayscale(0.3) brightness(0.86);
+  opacity: 0.72;
+  pointer-events: auto;
+}
+
+.checkoutHint {
+  margin: 0;
+  font-size: 0.83rem;
+  color: #7a532f;
 }
 
 .backdrop {

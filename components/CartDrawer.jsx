@@ -18,6 +18,9 @@ export default function CartDrawer() {
   } = useStore();
 
   const dayCount = getDayCount(orderMeta);
+  const hasSelectedDates = Boolean(orderMeta.startDate && orderMeta.endDate);
+  const needsDates = cart.length > 0 && !hasSelectedDates;
+  const checkoutHref = cart.length ? (hasSelectedDates ? '/summary' : '#') : '/empty-cart';
   const dateLabel = orderMeta.startDate && orderMeta.endDate ? `${orderMeta.startDate} → ${orderMeta.endDate} (${dayCount} days)` : '—';
 
   const dailySubtotal = cart.reduce((sum, line) => {
@@ -93,9 +96,21 @@ export default function CartDrawer() {
         <div className={styles.footer}>
           <div className={styles.subtotal}><span>Per-day subtotal</span><strong>{formatMoney(dailySubtotal)}</strong></div>
           <div className={styles.subtotal}><span>Trip total</span><strong>{formatMoney(subtotal)}</strong></div>
-          <Link href={cart.length ? '/summary' : '/empty-cart'} className={styles.checkout} onClick={() => setCartOpen(false)}>
+          <Link
+            href={checkoutHref}
+            className={`${styles.checkout} ${needsDates ? styles.checkoutDisabled : ''}`}
+            aria-disabled={needsDates}
+            onClick={event => {
+              if (needsDates) {
+                event.preventDefault();
+                return;
+              }
+              setCartOpen(false);
+            }}
+          >
             Checkout
           </Link>
+          {needsDates && <p className={styles.checkoutHint}>Select start and end dates to continue.</p>}
         </div>
       </aside>
 

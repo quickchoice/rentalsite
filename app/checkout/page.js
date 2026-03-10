@@ -66,7 +66,9 @@ export default function CheckoutPage() {
               <button type="button" className="btn btnSecondary" onClick={() => viewDate && setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1))}>›</button>
             </div>
 
-            <div className={styles.weekdays}>{['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => <span key={day}>{day}</span>)}</div>
+            <div className={styles.weekdays}>
+              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => <span key={`${day}-${index}`}>{day}</span>)}
+            </div>
 
             <div className={styles.grid}>
               {viewDate && Array.from({ length: startDay }).map((_, index) => <span key={`empty-${index}`} className={styles.empty} />)}

@@ -13,6 +13,12 @@
   cursor: pointer;
   z-index: 95;
   box-shadow: 0 10px 24px rgba(25, 76, 110, 0.28);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.bubble:active {
+  transform: translateY(2px) scale(0.97);
+  box-shadow: 0 5px 12px rgba(25, 76, 110, 0.24);
 }
 
 .icon {
@@ -25,4 +31,35 @@
   top: 0.85rem;
   font-weight: 800;
   font-size: 0.85rem;
+}
+
+.bounce {
+  animation: bubbleBounce 380ms cubic-bezier(0.22, 1.35, 0.36, 1);
+}
+
+.iconBounce {
+  animation: iconBounce 380ms cubic-bezier(0.2, 1.1, 0.32, 1);
+}
+
+.countBounce {
+  animation: countBounce 380ms cubic-bezier(0.18, 1.15, 0.34, 1);
+}
+
+@keyframes bubbleBounce {
+  0% { transform: scale(1); }
+  42% { transform: scale(1.14); }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+@keyframes iconBounce {
+  0% { transform: translateY(0); }
+  45% { transform: translateY(-3px) scale(1.1); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes countBounce {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.22); }
+  100% { transform: scale(1); }
 }

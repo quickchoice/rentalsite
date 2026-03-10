@@ -103,6 +103,9 @@
 }
 
 .actions :global(.btn) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   white-space: nowrap;
   font-size: clamp(0.68rem, 1.5vw, 0.88rem);

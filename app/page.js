@@ -1,14 +1,16 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import styles from '@/app/page.module.css';
 import { withBasePath } from '@/lib/paths';
 
 const navLinks = [
   { href: '/category/baby', label: 'Baby Equipment' },
   { href: '/category/beach', label: 'Beach Gear' },
-  { href: '#accessibility', label: 'Handicap Options' },
-  { href: '#how-it-works', label: 'How It Works' },
-  { href: '#faq', label: 'FAQ' }
+  { href: '/how-it-works', label: 'How It Works' },
+  { href: '/faq', label: 'FAQ' }
 ];
 
 const trustItems = [
@@ -18,7 +20,38 @@ const trustItems = [
   { icon: '/rentals/visual/trust-images/pay.svg', label: 'Easy checkout' }
 ];
 
+const carouselImages = [
+  '/rentals/visual/carosel-images/Charleston1.jpg',
+  '/rentals/visual/carosel-images/charleston2.webp',
+  '/rentals/visual/carosel-images/charleston3.jpg',
+  '/rentals/visual/carosel-images/myrtle1.webp',
+  '/rentals/visual/carosel-images/myrtle2.jpg',
+  '/rentals/visual/carosel-images/crib.png'
+];
+
 export default function HomePage() {
+  const [slideIndex, setSlideIndex] = useState(0);
+  const [isTransitionEnabled, setIsTransitionEnabled] = useState(true);
+  const slides = [...carouselImages, carouselImages[0]];
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setSlideIndex(prev => prev + 1);
+    }, 2600);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  function handleTransitionEnd() {
+    if (slideIndex !== carouselImages.length) return;
+    setIsTransitionEnabled(false);
+    setSlideIndex(0);
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        setIsTransitionEnabled(true);
+      });
+    });
+  }
+
   return (
     <main className={styles.page}>
       <header className={styles.topNav}>
@@ -43,19 +76,29 @@ export default function HomePage() {
       </header>
 
       <section className={styles.hero}>
-        <img
-          className={styles.heroImage}
-          src={withBasePath('/rentals/visual/carosel-images/peopleatbeach.webp')}
-          alt="Bright, clean vacation home interior"
-        />
+        <div className={styles.heroViewport}>
+          <div
+            className={`${styles.heroTrack} ${isTransitionEnabled ? styles.heroTrackAnimated : styles.heroTrackStatic}`}
+            style={{ transform: `translateX(-${slideIndex * 100}%)` }}
+            onTransitionEnd={handleTransitionEnd}
+          >
+            {slides.map((image, index) => (
+              <img
+                key={`${image}-${index}`}
+                className={styles.heroImage}
+                src={withBasePath(image)}
+                alt="Bright, clean vacation home interior"
+              />
+            ))}
+          </div>
+        </div>
         <div className={styles.heroFade} aria-hidden="true" />
       </section>
 
       <section className={styles.intro}>
         <h1>Vacation rentals, delivered to your door.</h1>
         <p>
-          Baby gear, beach gear, and accessibility essentials in Charleston & Myrtle Beach, clean, on-time, and
-          effortless.
+          Baby gear and beach gear in Charleston & Myrtle Beach, clean, on-time, and effortless.
         </p>
 
         <div className={styles.ctaRow}>
@@ -75,14 +118,7 @@ export default function HomePage() {
             </li>
           ))}
         </ul>
-
-        <Link id="accessibility" href="/category/beach" className={styles.accessibilityLink}>
-          Need accessibility options?
-        </Link>
       </section>
-
-      <section id="how-it-works" className={styles.hiddenAnchor} aria-hidden="true" />
-      <section id="faq" className={styles.hiddenAnchor} aria-hidden="true" />
     </main>
   );
 }
