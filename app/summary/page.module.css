@@ -33,19 +33,52 @@
   font-size: 1.1rem;
 }
 
-.promoField {
+.contactBlock {
+  border: 1px solid #d8c39b;
+  border-radius: 0.65rem;
+  background: rgba(255, 252, 245, 0.85);
+  padding: 0.85rem;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.contactBlock h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #1f4f7a;
+}
+
+.contactGrid {
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.contactGrid label {
   display: grid;
   gap: 0.4rem;
   font-size: 0.95rem;
   color: #3a311e;
 }
 
-.promoField input {
+.contactGrid input,
+.contactGrid select,
+.contactGrid textarea {
   border: 1px solid #d8c39b;
   border-radius: 0.55rem;
   padding: 0.55rem 0.7rem;
   font: inherit;
   background: #fffdf8;
+}
+
+.messageField {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+  .contactGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .notice {

@@ -73,7 +73,23 @@ function buildLineItemsText(lineItems, currency) {
     .join('\n');
 }
 
-function buildEmailBody({ sessionId, paymentIntentId, customerName, customerEmail, amountTotal, currency, dayCount, startDate, endDate, lineItemsText }) {
+function buildEmailBody({
+  sessionId,
+  paymentIntentId,
+  customerName,
+  customerEmail,
+  customerPhone,
+  arrivalDate,
+  deliveryArea,
+  referralSource,
+  customerMessage,
+  amountTotal,
+  currency,
+  dayCount,
+  startDate,
+  endDate,
+  lineItemsText
+}) {
   const paidAt = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
 
   return [
@@ -85,6 +101,11 @@ function buildEmailBody({ sessionId, paymentIntentId, customerName, customerEmai
     '',
     `Customer Name: ${customerName || 'N/A'}`,
     `Customer Email: ${customerEmail || 'N/A'}`,
+    `Customer Phone: ${customerPhone || 'N/A'}`,
+    `Arrival Date: ${arrivalDate || 'N/A'}`,
+    `Delivery Area: ${deliveryArea || 'N/A'}`,
+    `How They Heard About Us: ${referralSource || 'N/A'}`,
+    `Customer Message: ${customerMessage || 'N/A'}`,
     '',
     `Total Paid: ${formatMoneyFromCents(amountTotal, currency)}`,
     `Rental Days: ${dayCount || 'N/A'}`,
@@ -146,14 +167,19 @@ export async function POST(request) {
   const lineItemsResponse = await stripeGet(`/checkout/sessions/${sessionId}/line_items?limit=100`, stripeSecretKey);
   const lineItems = lineItemsResponse?.data || [];
 
-  const customerEmail = session.customer_details?.email || session.customer_email || '';
-  const customerName = session.customer_details?.name || '';
+  const customerEmail = session.customer_details?.email || session.customer_email || session.metadata?.customer_email || '';
+  const customerName = session.customer_details?.name || session.metadata?.customer_name || '';
+  const customerPhone = session.customer_details?.phone || session.metadata?.customer_phone || '';
   const currency = session.currency || 'usd';
   const amountTotal = Number(session.amount_total || 0);
 
   const dayCount = Number(session.metadata?.day_count || 0) || null;
   const startDate = session.metadata?.start_date || null;
   const endDate = session.metadata?.end_date || null;
+  const arrivalDate = session.metadata?.arrival_date || null;
+  const deliveryArea = session.metadata?.delivery_area || null;
+  const referralSource = session.metadata?.referral_source || null;
+  const customerMessage = session.metadata?.customer_message || null;
   const promoApplied = session.metadata?.promo_applied === 'true';
 
   const lineItemsText = buildLineItemsText(lineItems, currency);
@@ -170,7 +196,12 @@ export async function POST(request) {
     startDate,
     endDate,
     promoApplied,
-    lineItemsText
+    lineItemsText,
+    customerPhone,
+    arrivalDate,
+    deliveryArea,
+    referralSource,
+    customerMessage
   });
 
   if (!inserted) {
@@ -182,6 +213,11 @@ export async function POST(request) {
     paymentIntentId: session.payment_intent,
     customerName,
     customerEmail,
+    customerPhone,
+    arrivalDate,
+    deliveryArea,
+    referralSource,
+    customerMessage,
     amountTotal,
     currency,
     dayCount,

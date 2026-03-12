@@ -16,6 +16,11 @@ function normalizePromoCode(value) {
   return value.trim().toUpperCase();
 }
 
+function metaValue(value, maxLength = 450) {
+  if (typeof value !== 'string') return '';
+  return value.trim().slice(0, maxLength);
+}
+
 function sanitizeCart(cart) {
   if (!Array.isArray(cart)) return [];
 
@@ -58,7 +63,7 @@ function sanitizeCart(cart) {
   return [...normalizedProducts, ...normalizedBundles];
 }
 
-function buildStripeCheckoutParams({ lineItems, orderMeta, dayCount, origin, promoApplied }) {
+function buildStripeCheckoutParams({ lineItems, orderMeta, customerInfo, dayCount, origin, promoApplied }) {
   const params = new URLSearchParams();
 
   params.set('mode', 'payment');
@@ -71,6 +76,16 @@ function buildStripeCheckoutParams({ lineItems, orderMeta, dayCount, origin, pro
   params.set('metadata[location]', orderMeta.location);
   params.set('metadata[day_count]', String(dayCount));
   params.set('metadata[delivery_fee_cents]', String(DELIVERY_FEE_CENTS));
+  params.set('metadata[customer_name]', metaValue(customerInfo.name));
+  params.set('metadata[customer_email]', metaValue(customerInfo.email));
+  params.set('metadata[customer_phone]', metaValue(customerInfo.phone));
+  params.set('metadata[arrival_date]', metaValue(customerInfo.arrivalDate));
+  params.set('metadata[delivery_area]', metaValue(customerInfo.deliveryArea));
+  params.set('metadata[referral_source]', metaValue(customerInfo.referralSource));
+  params.set('metadata[customer_message]', metaValue(customerInfo.message));
+  if (customerInfo.email) {
+    params.set('customer_email', customerInfo.email);
+  }
   params.set('metadata[promo_applied]', promoApplied ? 'true' : 'false');
   if (promoApplied) {
     params.set('metadata[promo_discount_percent]', String(DISCOUNT_PERCENT));
@@ -123,6 +138,16 @@ export async function POST(request) {
   }
 
   const orderMeta = payload?.orderMeta || {};
+  const customerInfoPayload = payload?.customerInfo || {};
+  const customerInfo = {
+    name: typeof customerInfoPayload.name === 'string' ? customerInfoPayload.name.trim() : '',
+    email: typeof customerInfoPayload.email === 'string' ? customerInfoPayload.email.trim() : '',
+    phone: typeof customerInfoPayload.phone === 'string' ? customerInfoPayload.phone.trim() : '',
+    arrivalDate: typeof customerInfoPayload.arrivalDate === 'string' ? customerInfoPayload.arrivalDate.trim() : '',
+    deliveryArea: typeof customerInfoPayload.deliveryArea === 'string' ? customerInfoPayload.deliveryArea.trim() : '',
+    referralSource: typeof customerInfoPayload.referralSource === 'string' ? customerInfoPayload.referralSource.trim() : '',
+    message: typeof customerInfoPayload.message === 'string' ? customerInfoPayload.message.trim() : ''
+  };
   const enteredPromoCode = normalizePromoCode(payload?.promoCode);
   const expectedPromoCode = normalizePromoCode(
     process.env.CHECKOUT_PROMO_CODE || process.env.CHECKOUT_PROMO_CODE_99
@@ -145,6 +170,12 @@ export async function POST(request) {
   if (!start || !end || end < start) {
     return NextResponse.json(
       { error: 'Invalid rental dates. Please select a valid date range.' },
+      { status: 400 }
+    );
+  }
+  if (!customerInfo.name || !customerInfo.email) {
+    return NextResponse.json(
+      { error: 'Name and email are required before checkout.' },
       { status: 400 }
     );
   }
@@ -205,6 +236,7 @@ export async function POST(request) {
   const params = buildStripeCheckoutParams({
     lineItems,
     orderMeta: { ...orderMeta, location },
+    customerInfo,
     dayCount,
     origin,
     promoApplied

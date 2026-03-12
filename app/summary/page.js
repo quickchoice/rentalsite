@@ -13,11 +13,35 @@ export default function SummaryPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [wasCanceled, setWasCanceled] = useState(false);
-  const [promoCode, setPromoCode] = useState('');
+  const [customerInfo, setCustomerInfo] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    arrivalDate: '',
+    deliveryArea: '',
+    referralSource: '',
+    message: ''
+  });
   const days = getDayCount(orderMeta);
   const deliveryFee = getDeliveryFee(cart);
   const totalWithDelivery = subtotal + deliveryFee;
   const locationName = locations.find(location => location.id === orderMeta.location)?.name || 'Not selected';
+  const deliveryAreas = [
+    'Charleston',
+    'Myrtle Beach',
+    'Mount Pleasant',
+    'North Charleston',
+    'Isle of Palms',
+    'Kiawah / Seabrook'
+  ];
+  const referralSources = [
+    'Google Search',
+    'Instagram',
+    'Facebook',
+    'Vacation Rental Host',
+    'Friend / Family',
+    'Returning Customer'
+  ];
 
   useEffect(() => {
     const canceled = new URLSearchParams(window.location.search).get('canceled') === '1';
@@ -37,6 +61,10 @@ export default function SummaryPage() {
       setError('Your cart is empty.');
       return;
     }
+    if (!customerInfo.name.trim() || !customerInfo.email.trim()) {
+      setError('Please enter your name and email.');
+      return;
+    }
 
     setError('');
     setIsSubmitting(true);
@@ -45,7 +73,7 @@ export default function SummaryPage() {
       const response = await fetch(withBasePath('/api/checkout-session'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cart, orderMeta, promoCode })
+        body: JSON.stringify({ cart, orderMeta, customerInfo })
       });
       const contentType = response.headers.get('content-type') || '';
       let data = null;
@@ -133,16 +161,73 @@ export default function SummaryPage() {
           <div className={styles.subtotal}><span>Rental subtotal</span><strong>{formatMoney(subtotal)}</strong></div>
           <div className={styles.subtotal}><span>Delivery fee</span><strong>{formatMoney(deliveryFee)}</strong></div>
           <div className={styles.subtotal}><span>Total</span><strong>{formatMoney(totalWithDelivery)}</strong></div>
-          <label className={styles.promoField}>
-            Promo code (optional)
-            <input
-              type="text"
-              value={promoCode}
-              onChange={event => setPromoCode(event.target.value)}
-              placeholder="Enter promo code"
-              autoComplete="off"
-            />
-          </label>
+          <div className={styles.contactBlock}>
+            <h2>Contact Info</h2>
+            <div className={styles.contactGrid}>
+              <label>
+                Your Name (required)
+                <input
+                  type="text"
+                  value={customerInfo.name}
+                  onChange={event => setCustomerInfo(prev => ({ ...prev, name: event.target.value }))}
+                  required
+                />
+              </label>
+              <label>
+                Your Email (required)
+                <input
+                  type="email"
+                  value={customerInfo.email}
+                  onChange={event => setCustomerInfo(prev => ({ ...prev, email: event.target.value }))}
+                  required
+                />
+              </label>
+              <label>
+                Cell Phone
+                <input
+                  type="tel"
+                  value={customerInfo.phone}
+                  onChange={event => setCustomerInfo(prev => ({ ...prev, phone: event.target.value }))}
+                />
+              </label>
+              <label>
+                Arrival Date
+                <input
+                  type="date"
+                  value={customerInfo.arrivalDate}
+                  onChange={event => setCustomerInfo(prev => ({ ...prev, arrivalDate: event.target.value }))}
+                />
+              </label>
+              <label>
+                Delivery Area
+                <select
+                  value={customerInfo.deliveryArea}
+                  onChange={event => setCustomerInfo(prev => ({ ...prev, deliveryArea: event.target.value }))}
+                >
+                  <option value="">—Please choose an option—</option>
+                  {deliveryAreas.map(area => <option key={area} value={area}>{area}</option>)}
+                </select>
+              </label>
+              <label>
+                How did you hear about us?
+                <select
+                  value={customerInfo.referralSource}
+                  onChange={event => setCustomerInfo(prev => ({ ...prev, referralSource: event.target.value }))}
+                >
+                  <option value="">—Please choose an option—</option>
+                  {referralSources.map(source => <option key={source} value={source}>{source}</option>)}
+                </select>
+              </label>
+              <label className={styles.messageField}>
+                Your Message
+                <textarea
+                  rows={4}
+                  value={customerInfo.message}
+                  onChange={event => setCustomerInfo(prev => ({ ...prev, message: event.target.value }))}
+                />
+              </label>
+            </div>
+          </div>
           <p className="muted">Secure checkout is handled by Stripe.</p>
           {error && <p className={styles.error}>{error}</p>}
           <button type="button" className="btn btnPrimary" onClick={onPayNow} disabled={isSubmitting}>
