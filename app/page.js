@@ -12,7 +12,8 @@ const navLinks = [
   { href: '/category/baby', label: 'Baby Equipment' },
   { href: '/category/beach', label: 'Beach Gear' },
   { href: '/how-it-works', label: 'How It Works' },
-  { href: '/faq', label: 'FAQ' }
+  { href: '/faq', label: 'FAQ' },
+  { href: '/contact', label: 'Contact Us' }
 ];
 
 const trustItems = [
@@ -101,16 +102,17 @@ export default function HomePage() {
       </section>
 
       <section className={styles.intro}>
-        <h1>Vacation rentals, delivered to your door.</h1>
+        <h1>Vacation essentials, delivered to your door.</h1>
         <p>
           Baby gear and beach gear in Charleston & Myrtle Beach, clean, on-time, and effortless.
         </p>
+        <p className={styles.savingsTag}>Instant Savings on select items every day.</p>
 
         <div className={styles.ctaRow}>
-          <Link href={`/category/baby?location=${activeLocation}`} className={`${styles.cta} ${styles.ctaPrimary}`}>
+          <Link href="/category/baby" className={`${styles.cta} ${styles.ctaPrimary}`}>
             Browse Baby Gear
           </Link>
-          <Link href={`/category/beach?location=${activeLocation}`} className={`${styles.cta} ${styles.ctaSecondary}`}>
+          <Link href="/category/beach" className={`${styles.cta} ${styles.ctaSecondary}`}>
             Browse Beach Gear
           </Link>
         </div>

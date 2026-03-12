@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import styles from '@/components/CartDrawer.module.css';
 import { useStore } from '@/context/StoreContext';
-import { formatMoney, getDayCount, getProductById } from '@/lib/cart';
+import { formatMoney, getBundleBasePricePerDay, getBundleById, getDayCount, getDeliveryFee, getProductById } from '@/lib/cart';
 import { locations } from '@/lib/data';
 
 export default function CartDrawer() {
@@ -29,10 +29,18 @@ export default function CartDrawer() {
   const dateLabel = orderMeta.startDate && orderMeta.endDate ? `${orderMeta.startDate} → ${orderMeta.endDate} (${dayCount} days)` : '—';
 
   const dailySubtotal = cart.reduce((sum, line) => {
+    if (line.type === 'bundle' && line.bundleId) {
+      const bundle = getBundleById(line.bundleId);
+      if (!bundle) return sum;
+      return sum + bundle.pricePerDay * line.qty;
+    }
     const product = getProductById(line.productId);
     if (!product) return sum;
-    return sum + product.pricePerDay * line.qty;
+    const discountMultiplier = (100 - (line.discountPercent || 0)) / 100;
+    return sum + product.pricePerDay * discountMultiplier * line.qty;
   }, 0);
+  const deliveryFee = getDeliveryFee(cart);
+  const totalWithDelivery = subtotal + deliveryFee;
 
   function onStartDateChange(value) {
     const next = { ...orderMeta, startDate: value };
@@ -61,22 +69,64 @@ export default function CartDrawer() {
         <div className={styles.lines}>
           {!cart.length && <p className={styles.muted}>Your cart is empty.</p>}
           {cart.map(line => {
+            if (line.type === 'bundle') {
+              const bundle = getBundleById(line.bundleId);
+              if (!bundle) return null;
+              const basePrice = getBundleBasePricePerDay(bundle);
+              const bundleDiscountPercent = bundle.discountPercent || 0;
+
+              return (
+                <div key={`bundle-${line.bundleId}`} className={styles.line}>
+                  <div className={styles.itemMain}>
+                    <img src={bundle.imageUrl} alt={bundle.name} className={styles.thumb} />
+                    <div>
+                      <strong>{bundle.name}</strong>
+                      <p className={styles.muted}>
+                        <span className={styles.oldPrice}>{formatMoney(basePrice)}/day</span>{' '}
+                        <span>{formatMoney(bundle.pricePerDay)}/day</span>{' '}
+                        <span className={styles.discountLabel}>Bundle {bundleDiscountPercent}% off</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div className={styles.actions}>
+                    <button type="button" onClick={() => updateQty({ type: 'bundle', bundleId: line.bundleId }, -1)}>-</button>
+                    <span>{line.qty}</span>
+                    <button type="button" onClick={() => updateQty({ type: 'bundle', bundleId: line.bundleId }, 1)}>+</button>
+                    <button type="button" onClick={() => removeFromCart({ type: 'bundle', bundleId: line.bundleId })}>Remove</button>
+                  </div>
+                </div>
+              );
+            }
+
             const product = getProductById(line.productId);
             if (!product) return null;
+            const discountPercent = line.discountPercent || 0;
+            const discountedPricePerDay = product.pricePerDay * ((100 - discountPercent) / 100);
+            const lineKey = `${line.productId}-${discountPercent}`;
             return (
-              <div key={line.productId} className={styles.line}>
+              <div key={lineKey} className={styles.line}>
                 <div className={styles.itemMain}>
                   <img src={product.imageUrl} alt={product.name} className={styles.thumb} />
                   <div>
                     <strong>{product.name}</strong>
-                    <p className={styles.muted}>{formatMoney(product.pricePerDay)}/day</p>
+                    <p className={styles.muted}>
+                      {discountPercent > 0 ? (
+                        <>
+                          <span className={styles.oldPrice}>{formatMoney(product.pricePerDay)}/day</span>{' '}
+                          <span>{formatMoney(discountedPricePerDay)}/day</span>{' '}
+                          <span className={styles.discountLabel}>Bundle {discountPercent}% off</span>
+                        </>
+                      ) : (
+                        <>{formatMoney(product.pricePerDay)}/day</>
+                      )}
+                    </p>
                   </div>
                 </div>
                 <div className={styles.actions}>
-                  <button type="button" onClick={() => updateQty(line.productId, -1)}>-</button>
+                  <button type="button" onClick={() => updateQty({ type: 'product', productId: line.productId, discountPercent }, -1)}>-</button>
                   <span>{line.qty}</span>
-                  <button type="button" onClick={() => updateQty(line.productId, 1)}>+</button>
-                  <button type="button" onClick={() => removeFromCart(line.productId)}>Remove</button>
+                  <button type="button" onClick={() => updateQty({ type: 'product', productId: line.productId, discountPercent }, 1)}>+</button>
+                  <button type="button" onClick={() => removeFromCart({ type: 'product', productId: line.productId, discountPercent })}>Remove</button>
                 </div>
               </div>
             );
@@ -114,7 +164,9 @@ export default function CartDrawer() {
 
         <div className={styles.footer}>
           <div className={styles.subtotal}><span>Per-day subtotal</span><strong>{formatMoney(dailySubtotal)}</strong></div>
-          <div className={styles.subtotal}><span>Trip total</span><strong>{formatMoney(subtotal)}</strong></div>
+          <div className={styles.subtotal}><span>Trip subtotal</span><strong>{formatMoney(subtotal)}</strong></div>
+          <div className={styles.subtotal}><span>Delivery fee</span><strong>{formatMoney(deliveryFee)}</strong></div>
+          <div className={styles.subtotal}><span>Total</span><strong>{formatMoney(totalWithDelivery)}</strong></div>
           <Link
             href={checkoutHref}
             className={`${styles.checkout} ${cannotCheckout ? styles.checkoutDisabled : ''}`}

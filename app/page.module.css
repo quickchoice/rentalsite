@@ -118,6 +118,19 @@
   line-height: 1.4;
 }
 
+.savingsTag {
+  margin: 0.8rem auto 0;
+  display: inline-block;
+  border: 1px solid #b11f1f;
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  background: #fff1f1;
+  color: #9f1414;
+  font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
 .ctaRow {
   margin-top: 2rem;
   display: flex;

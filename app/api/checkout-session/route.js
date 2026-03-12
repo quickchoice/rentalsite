@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server';
 import { getDayCount, parseDateLocal } from '@/lib/cart';
-import { products } from '@/lib/data';
+import { bundles, products } from '@/lib/data';
 
 const productById = new Map(products.map(product => [product.id, product]));
+const bundleById = new Map(bundles.map(bundle => [bundle.id, bundle]));
 const MAX_QTY_PER_LINE = 25;
 const DISCOUNT_PERCENT = 20;
 const DISCOUNT_MULTIPLIER = (100 - DISCOUNT_PERCENT) / 100;
 const validLocations = new Set(['charleston', 'myrtle-beach']);
+const parsedDeliveryFeeCents = Number(process.env.CHECKOUT_DELIVERY_FEE_CENTS || 2500);
+const DELIVERY_FEE_CENTS = Number.isFinite(parsedDeliveryFeeCents) ? Math.max(0, Math.round(parsedDeliveryFeeCents)) : 2500;
 
 function normalizePromoCode(value) {
   if (typeof value !== 'string') return '';
@@ -16,19 +19,43 @@ function normalizePromoCode(value) {
 function sanitizeCart(cart) {
   if (!Array.isArray(cart)) return [];
 
-  const merged = new Map();
+  const productLines = new Map();
+  const bundleLines = new Map();
   cart.forEach(line => {
+    if (line?.type === 'bundle') {
+      const bundleId = typeof line?.bundleId === 'string' ? line.bundleId : '';
+      if (!bundleById.has(bundleId)) return;
+      const qty = Math.max(1, Math.min(MAX_QTY_PER_LINE, Math.floor(Number(line.qty) || 1)));
+      bundleLines.set(bundleId, (bundleLines.get(bundleId) || 0) + qty);
+      return;
+    }
+
     const productId = typeof line?.productId === 'string' ? line.productId : '';
     if (!productById.has(productId)) return;
 
     const qty = Math.max(1, Math.min(MAX_QTY_PER_LINE, Math.floor(Number(line.qty) || 1)));
-    merged.set(productId, (merged.get(productId) || 0) + qty);
+    const discountPercent = Math.max(0, Math.min(100, Math.floor(Number(line.discountPercent) || 0)));
+    const key = `${productId}::${discountPercent}`;
+    productLines.set(key, {
+      productId,
+      discountPercent,
+      qty: (productLines.get(key)?.qty || 0) + qty
+    });
   });
 
-  return Array.from(merged.entries()).map(([productId, qty]) => ({
-    productId,
+  const normalizedProducts = Array.from(productLines.values()).map(line => ({
+    type: 'product',
+    productId: line.productId,
+    discountPercent: line.discountPercent,
+    qty: Math.min(line.qty, MAX_QTY_PER_LINE)
+  }));
+  const normalizedBundles = Array.from(bundleLines.entries()).map(([bundleId, qty]) => ({
+    type: 'bundle',
+    bundleId,
     qty: Math.min(qty, MAX_QTY_PER_LINE)
   }));
+
+  return [...normalizedProducts, ...normalizedBundles];
 }
 
 function buildStripeCheckoutParams({ lineItems, orderMeta, dayCount, origin, promoApplied }) {
@@ -43,6 +70,7 @@ function buildStripeCheckoutParams({ lineItems, orderMeta, dayCount, origin, pro
   params.set('metadata[end_date]', orderMeta.endDate);
   params.set('metadata[location]', orderMeta.location);
   params.set('metadata[day_count]', String(dayCount));
+  params.set('metadata[delivery_fee_cents]', String(DELIVERY_FEE_CENTS));
   params.set('metadata[promo_applied]', promoApplied ? 'true' : 'false');
   if (promoApplied) {
     params.set('metadata[promo_discount_percent]', String(DISCOUNT_PERCENT));
@@ -62,6 +90,18 @@ function buildStripeCheckoutParams({ lineItems, orderMeta, dayCount, origin, pro
       lineItem.productId
     );
   });
+
+  if (DELIVERY_FEE_CENTS > 0) {
+    const deliveryIndex = lineItems.length;
+    params.set(`line_items[${deliveryIndex}][quantity]`, '1');
+    params.set(`line_items[${deliveryIndex}][price_data][currency]`, 'usd');
+    params.set(`line_items[${deliveryIndex}][price_data][unit_amount]`, String(DELIVERY_FEE_CENTS));
+    params.set(`line_items[${deliveryIndex}][price_data][product_data][name]`, 'Delivery fee');
+    params.set(
+      `line_items[${deliveryIndex}][price_data][product_data][description]`,
+      'Flat delivery fee (not charged per rental day)'
+    );
+  }
 
   return params;
 }
@@ -116,20 +156,41 @@ export async function POST(request) {
 
   const dayCount = getDayCount(orderMeta);
   const lineItems = cart.map(line => {
+    if (line.type === 'bundle') {
+      const bundle = bundleById.get(line.bundleId);
+      if (!bundle) return null;
+      const baseUnitAmountCents = Math.round(bundle.pricePerDay * dayCount * 100);
+      if (baseUnitAmountCents <= 0) return null;
+      const unitAmountCents = promoApplied
+        ? Math.max(1, Math.round(baseUnitAmountCents * DISCOUNT_MULTIPLIER))
+        : baseUnitAmountCents;
+
+      return {
+        productId: `bundle:${bundle.id}`,
+        name: bundle.name,
+        qty: line.qty,
+        unitAmountCents,
+        pricePerDayLabel: `$${bundle.pricePerDay.toFixed(2)}`
+      };
+    }
+
     const product = productById.get(line.productId);
     if (!product) return null;
     const baseUnitAmountCents = Math.round(product.pricePerDay * dayCount * 100);
     if (baseUnitAmountCents <= 0) return null;
+    const productDiscountMultiplier = (100 - line.discountPercent) / 100;
+    const discountedForProductCents = Math.max(1, Math.round(baseUnitAmountCents * productDiscountMultiplier));
     const unitAmountCents = promoApplied
-      ? Math.max(1, Math.round(baseUnitAmountCents * DISCOUNT_MULTIPLIER))
-      : baseUnitAmountCents;
+      ? Math.max(1, Math.round(discountedForProductCents * DISCOUNT_MULTIPLIER))
+      : discountedForProductCents;
+    const pricePerDayLabel = `$${(product.pricePerDay * productDiscountMultiplier).toFixed(2)}`;
 
     return {
       productId: product.id,
       name: product.name,
       qty: line.qty,
       unitAmountCents,
-      pricePerDayLabel: `$${product.pricePerDay}`
+      pricePerDayLabel
     };
   }).filter(Boolean);
 

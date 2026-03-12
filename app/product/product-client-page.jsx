@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import RentalsShell from '@/components/RentalsShell';
 import styles from '@/app/product/page.module.css';
-import { categories, locations, products } from '@/lib/data';
+import { categories, products } from '@/lib/data';
 import { formatMoney } from '@/lib/cart';
 import { useStore } from '@/context/StoreContext';
 
 export default function ProductClientPage({ productId }) {
-  const { addToCart, orderMeta, setLocation } = useStore();
+  const { addToCart } = useStore();
   const [qty, setQty] = useState(1);
 
   const product = useMemo(() => {
@@ -17,8 +17,6 @@ export default function ProductClientPage({ productId }) {
   }, [productId]);
 
   const categoryName = categories.find(category => category.id === product.categoryId)?.name ?? 'Category';
-  const locationName = locations.find(location => location.id === orderMeta.location)?.name || 'Select location';
-
   return (
     <RentalsShell backHref={`/category/${product.categoryId}`}>
       <main>
@@ -29,19 +27,6 @@ export default function ProductClientPage({ productId }) {
             <p className={styles.category}>{categoryName}</p>
             <h1>{product.name}</h1>
             <p className={styles.price}>{formatMoney(product.pricePerDay)}/day</p>
-            <p className="muted">Service area: {locationName}</p>
-            <div className={styles.locationRow}>
-              {locations.map(location => (
-                <button
-                  key={location.id}
-                  type="button"
-                  className={`${styles.locationBtn} ${orderMeta.location === location.id ? styles.locationBtnActive : ''}`}
-                  onClick={() => setLocation(location.id)}
-                >
-                  {location.name}
-                </button>
-              ))}
-            </div>
             <p className="muted">{product.shortDescription}</p>
 
             <div className={styles.qtyRow}>

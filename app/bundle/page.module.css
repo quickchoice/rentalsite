@@ -7,7 +7,7 @@
 .image {
   min-height: 18rem;
   border-radius: var(--radius-lg);
-  background: #fff center / contain no-repeat;
+  background: #fff center / cover no-repeat;
   box-shadow: var(--shadow);
   border: 1px solid #d8c39b;
 }
@@ -25,6 +25,17 @@
   margin: 0.5rem 0;
   color: var(--accent);
   font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.oldPrice {
+  text-decoration: line-through;
+  color: #8f8f8f;
+}
+
+.discountLabel {
+  margin: 0 0 0.3rem;
+  color: #0f4d21;
   font-weight: 800;
 }
 
@@ -61,6 +72,26 @@
   border-radius: 0.9rem;
   padding: 0.8rem 0.9rem;
   background: rgba(255, 251, 242, 0.9);
+}
+
+.section ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.section li {
+  display: flex;
+  align-items: center;
+  min-height: 1.8rem;
+  line-height: 1.25;
+}
+
+.section a {
+  color: #1f5b96;
+  text-decoration: underline;
+  font-weight: 700;
 }
 
 @media (min-width: 900px) {

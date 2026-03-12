@@ -114,8 +114,13 @@
 .image {
   height: 9rem;
   border-radius: var(--radius);
-  background: #eaf1f4 center / cover no-repeat;
+  background: #fff center / contain no-repeat;
   border: 1px solid #dbc59d;
+}
+
+.bundleImage {
+  background-size: cover;
+  background-position: center;
 }
 
 .price {
@@ -175,6 +180,23 @@
   box-shadow: 0 8px 18px rgba(160, 8, 8, 0.65);
   transform: rotate(-6deg);
   animation: flashTagPulse 900ms ease-in-out infinite alternate;
+}
+
+.bundleTag {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.45rem;
+  z-index: 2;
+  background: linear-gradient(135deg, #1f5b96, #163f6a);
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 0.6rem;
+  padding: 0.26rem 0.58rem;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 16px rgba(17, 53, 87, 0.45);
 }
 
 .priceLine {

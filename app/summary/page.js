@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import RentalsShell from '@/components/RentalsShell';
 import styles from '@/app/summary/page.module.css';
 import { useStore } from '@/context/StoreContext';
-import { formatMoney, getDayCount, getProductById } from '@/lib/cart';
+import { formatMoney, getBundleBasePricePerDay, getBundleById, getDayCount, getDeliveryFee, getProductById } from '@/lib/cart';
 import { locations } from '@/lib/data';
 import { withBasePath } from '@/lib/paths';
 
@@ -15,6 +15,8 @@ export default function SummaryPage() {
   const [wasCanceled, setWasCanceled] = useState(false);
   const [promoCode, setPromoCode] = useState('');
   const days = getDayCount(orderMeta);
+  const deliveryFee = getDeliveryFee(cart);
+  const totalWithDelivery = subtotal + deliveryFee;
   const locationName = locations.find(location => location.id === orderMeta.location)?.name || 'Not selected';
 
   useEffect(() => {
@@ -45,8 +47,18 @@ export default function SummaryPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cart, orderMeta, promoCode })
       });
-
-      const data = await response.json();
+      const contentType = response.headers.get('content-type') || '';
+      let data = null;
+      if (contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        const rawText = await response.text();
+        const looksLikeHtml = rawText.trimStart().startsWith('<');
+        if (looksLikeHtml) {
+          throw new Error('Checkout is unavailable on this preview site. Please use the live production checkout.');
+        }
+        throw new Error('Checkout service returned an unexpected response.');
+      }
       if (!response.ok || !data?.url) {
         throw new Error(data?.error || 'Could not start checkout.');
       }
@@ -69,15 +81,48 @@ export default function SummaryPage() {
 
           <div className={styles.lines}>
             {!cart.length && <p className="muted">Your cart is empty.</p>}
-            {cart.map(line => {
+            {cart.map((line, index) => {
+              if (line.type === 'bundle') {
+                const bundle = getBundleById(line.bundleId);
+                if (!bundle) return null;
+                const bundleBasePrice = getBundleBasePricePerDay(bundle);
+                const lineTotal = bundle.pricePerDay * line.qty * days;
+                return (
+                  <div key={`bundle-${line.bundleId}-${index}`} className={styles.line}>
+                    <div>
+                      <strong>{bundle.name}</strong>
+                      <p className="muted">
+                        <span className={styles.oldPrice}>{formatMoney(bundleBasePrice)}/day</span>{' '}
+                        {formatMoney(bundle.pricePerDay)}/day × {line.qty} × {days} day(s){' '}
+                        <span className={styles.discountLabel}>Bundle {bundle.discountPercent || 10}% off</span>
+                      </p>
+                    </div>
+                    <strong>{formatMoney(lineTotal)}</strong>
+                  </div>
+                );
+              }
+
               const product = getProductById(line.productId);
               if (!product) return null;
-              const lineTotal = product.pricePerDay * line.qty * days;
+              const discountPercent = line.discountPercent || 0;
+              const discountedPricePerDay = product.pricePerDay * ((100 - discountPercent) / 100);
+              const lineTotal = discountedPricePerDay * line.qty * days;
+              const lineKey = `${line.productId}-${discountPercent}-${index}`;
               return (
-                <div key={line.productId} className={styles.line}>
+                <div key={lineKey} className={styles.line}>
                   <div>
                     <strong>{product.name}</strong>
-                    <p className="muted">{formatMoney(product.pricePerDay)}/day × {line.qty} × {days} day(s)</p>
+                    <p className="muted">
+                      {discountPercent > 0 ? (
+                        <>
+                          <span className={styles.oldPrice}>{formatMoney(product.pricePerDay)}/day</span>{' '}
+                          {formatMoney(discountedPricePerDay)}/day × {line.qty} × {days} day(s){' '}
+                          <span className={styles.discountLabel}>Bundle {discountPercent}% off</span>
+                        </>
+                      ) : (
+                        <>{formatMoney(product.pricePerDay)}/day × {line.qty} × {days} day(s)</>
+                      )}
+                    </p>
                   </div>
                   <strong>{formatMoney(lineTotal)}</strong>
                 </div>
@@ -85,7 +130,9 @@ export default function SummaryPage() {
             })}
           </div>
 
-          <div className={styles.subtotal}><span>Subtotal</span><strong>{formatMoney(subtotal)}</strong></div>
+          <div className={styles.subtotal}><span>Rental subtotal</span><strong>{formatMoney(subtotal)}</strong></div>
+          <div className={styles.subtotal}><span>Delivery fee</span><strong>{formatMoney(deliveryFee)}</strong></div>
+          <div className={styles.subtotal}><span>Total</span><strong>{formatMoney(totalWithDelivery)}</strong></div>
           <label className={styles.promoField}>
             Promo code (optional)
             <input
@@ -96,7 +143,6 @@ export default function SummaryPage() {
               autoComplete="off"
             />
           </label>
-          <p className={styles.promoNote}>Standard site pricing reflects a 10% market discount. Active promo codes apply an additional 20% off.</p>
           <p className="muted">Secure checkout is handled by Stripe.</p>
           {error && <p className={styles.error}>{error}</p>}
           <button type="button" className="btn btnPrimary" onClick={onPayNow} disabled={isSubmitting}>
