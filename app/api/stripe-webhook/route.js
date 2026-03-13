@@ -159,7 +159,7 @@ export async function POST(request) {
   if (event.type !== 'checkout.session.completed') {
     return NextResponse.json({ received: true });
   }
-
+//
   const session = event.data?.object;
   const sessionId = session?.id;
 
