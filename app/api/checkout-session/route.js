@@ -79,6 +79,9 @@ function buildStripeCheckoutParams({ lineItems, orderMeta, customerInfo, dayCoun
   params.set('metadata[customer_name]', metaValue(customerInfo.name));
   params.set('metadata[customer_email]', metaValue(customerInfo.email));
   params.set('metadata[customer_phone]', metaValue(customerInfo.phone));
+  params.set('metadata[customer_address]', metaValue(customerInfo.address));
+  params.set('metadata[customer_zipcode]', metaValue(customerInfo.zipcode));
+  params.set('metadata[customer_state]', metaValue(customerInfo.state));
   params.set('metadata[arrival_date]', metaValue(customerInfo.arrivalDate));
   params.set('metadata[delivery_area]', metaValue(customerInfo.deliveryArea));
   params.set('metadata[referral_source]', metaValue(customerInfo.referralSource));
@@ -143,6 +146,9 @@ export async function POST(request) {
     name: typeof customerInfoPayload.name === 'string' ? customerInfoPayload.name.trim() : '',
     email: typeof customerInfoPayload.email === 'string' ? customerInfoPayload.email.trim() : '',
     phone: typeof customerInfoPayload.phone === 'string' ? customerInfoPayload.phone.trim() : '',
+    address: typeof customerInfoPayload.address === 'string' ? customerInfoPayload.address.trim() : '',
+    zipcode: typeof customerInfoPayload.zipcode === 'string' ? customerInfoPayload.zipcode.trim() : '',
+    state: typeof customerInfoPayload.state === 'string' ? customerInfoPayload.state.trim() : '',
     arrivalDate: typeof customerInfoPayload.arrivalDate === 'string' ? customerInfoPayload.arrivalDate.trim() : '',
     deliveryArea: typeof customerInfoPayload.deliveryArea === 'string' ? customerInfoPayload.deliveryArea.trim() : '',
     referralSource: typeof customerInfoPayload.referralSource === 'string' ? customerInfoPayload.referralSource.trim() : '',
@@ -173,9 +179,24 @@ export async function POST(request) {
       { status: 400 }
     );
   }
-  if (!customerInfo.name || !customerInfo.email) {
+  const validDeliveryAreas = new Set(['Charleston', 'Myrtle Beach']);
+
+  if (
+    !customerInfo.name ||
+    !customerInfo.email ||
+    !customerInfo.address ||
+    !customerInfo.zipcode ||
+    !customerInfo.state ||
+    !customerInfo.deliveryArea
+  ) {
     return NextResponse.json(
-      { error: 'Name and email are required before checkout.' },
+      { error: 'Name, email, address, zip code, state, and city are required before checkout.' },
+      { status: 400 }
+    );
+  }
+  if (!validDeliveryAreas.has(customerInfo.deliveryArea)) {
+    return NextResponse.json(
+      { error: 'City must be Charleston or Myrtle Beach.' },
       { status: 400 }
     );
   }

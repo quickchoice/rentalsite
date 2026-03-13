@@ -79,6 +79,9 @@ function buildEmailBody({
   customerName,
   customerEmail,
   customerPhone,
+  customerAddress,
+  customerZipcode,
+  customerState,
   arrivalDate,
   deliveryArea,
   referralSource,
@@ -102,8 +105,11 @@ function buildEmailBody({
     `Customer Name: ${customerName || 'N/A'}`,
     `Customer Email: ${customerEmail || 'N/A'}`,
     `Customer Phone: ${customerPhone || 'N/A'}`,
+    `Customer Address: ${customerAddress || 'N/A'}`,
+    `Customer Zip Code: ${customerZipcode || 'N/A'}`,
+    `Customer State: ${customerState || 'N/A'}`,
     `Arrival Date: ${arrivalDate || 'N/A'}`,
-    `Delivery Area: ${deliveryArea || 'N/A'}`,
+    `City: ${deliveryArea || 'N/A'}`,
     `How They Heard About Us: ${referralSource || 'N/A'}`,
     `Customer Message: ${customerMessage || 'N/A'}`,
     '',
@@ -123,7 +129,8 @@ export async function POST(request) {
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
   const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   const resendApiKey = process.env.RESEND_API_KEY;
-  const resendFromEmail = process.env.RESEND_FROM_EMAIL;
+  const notifyEmail = process.env.ORDER_NOTIFY_EMAIL || DEFAULT_NOTIFY_EMAIL;
+  const resendFromEmail = process.env.RESEND_FROM_EMAIL || notifyEmail;
 
   if (!stripeSecretKey || !stripeWebhookSecret) {
     return NextResponse.json({ error: 'Missing STRIPE_SECRET_KEY or STRIPE_WEBHOOK_SECRET.' }, { status: 500 });
@@ -170,6 +177,9 @@ export async function POST(request) {
   const customerEmail = session.customer_details?.email || session.customer_email || session.metadata?.customer_email || '';
   const customerName = session.customer_details?.name || session.metadata?.customer_name || '';
   const customerPhone = session.customer_details?.phone || session.metadata?.customer_phone || '';
+  const customerAddress = session.metadata?.customer_address || null;
+  const customerZipcode = session.metadata?.customer_zipcode || null;
+  const customerState = session.metadata?.customer_state || null;
   const currency = session.currency || 'usd';
   const amountTotal = Number(session.amount_total || 0);
 
@@ -198,6 +208,9 @@ export async function POST(request) {
     promoApplied,
     lineItemsText,
     customerPhone,
+    customerAddress,
+    customerZipcode,
+    customerState,
     arrivalDate,
     deliveryArea,
     referralSource,
@@ -214,6 +227,9 @@ export async function POST(request) {
     customerName,
     customerEmail,
     customerPhone,
+    customerAddress,
+    customerZipcode,
+    customerState,
     arrivalDate,
     deliveryArea,
     referralSource,
@@ -231,8 +247,7 @@ export async function POST(request) {
       const emailResults = await sendTransactionSummaryEmail({
         resendApiKey,
         fromEmail: resendFromEmail,
-        danteEmail: process.env.ORDER_NOTIFY_EMAIL || DEFAULT_NOTIFY_EMAIL,
-        customerEmail,
+        danteEmail: notifyEmail,
         subject: `QuickChoice receipt: ${formatMoneyFromCents(amountTotal, currency)} (${sessionId})`,
         bodyText
       });

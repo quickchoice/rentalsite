@@ -142,6 +142,10 @@ export default function HomePage() {
           ))}
         </ul>
       </section>
+
+      <a href={withBasePath('/VendingSite/docs/')} className={styles.vendingLink}>
+        Looking for vending?
+      </a>
     </main>
   );
 }

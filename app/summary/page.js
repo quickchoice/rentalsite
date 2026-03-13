@@ -17,6 +17,9 @@ export default function SummaryPage() {
     name: '',
     email: '',
     phone: '',
+    address: '',
+    zipcode: '',
+    state: '',
     arrivalDate: '',
     deliveryArea: '',
     referralSource: '',
@@ -28,11 +31,7 @@ export default function SummaryPage() {
   const locationName = locations.find(location => location.id === orderMeta.location)?.name || 'Not selected';
   const deliveryAreas = [
     'Charleston',
-    'Myrtle Beach',
-    'Mount Pleasant',
-    'North Charleston',
-    'Isle of Palms',
-    'Kiawah / Seabrook'
+    'Myrtle Beach'
   ];
   const referralSources = [
     'Google Search',
@@ -61,8 +60,15 @@ export default function SummaryPage() {
       setError('Your cart is empty.');
       return;
     }
-    if (!customerInfo.name.trim() || !customerInfo.email.trim()) {
-      setError('Please enter your name and email.');
+    if (
+      !customerInfo.name.trim() ||
+      !customerInfo.email.trim() ||
+      !customerInfo.address.trim() ||
+      !customerInfo.zipcode.trim() ||
+      !customerInfo.state.trim() ||
+      !customerInfo.deliveryArea.trim()
+    ) {
+      setError('Please complete all required contact and city fields.');
       return;
     }
 
@@ -191,6 +197,34 @@ export default function SummaryPage() {
                 />
               </label>
               <label>
+                Address (required)
+                <input
+                  type="text"
+                  value={customerInfo.address}
+                  onChange={event => setCustomerInfo(prev => ({ ...prev, address: event.target.value }))}
+                  required
+                />
+              </label>
+              <label>
+                Zip Code (required)
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={customerInfo.zipcode}
+                  onChange={event => setCustomerInfo(prev => ({ ...prev, zipcode: event.target.value }))}
+                  required
+                />
+              </label>
+              <label>
+                State (required)
+                <input
+                  type="text"
+                  value={customerInfo.state}
+                  onChange={event => setCustomerInfo(prev => ({ ...prev, state: event.target.value }))}
+                  required
+                />
+              </label>
+              <label>
                 Arrival Date
                 <input
                   type="date"
@@ -199,10 +233,11 @@ export default function SummaryPage() {
                 />
               </label>
               <label>
-                Delivery Area
+                City (required)
                 <select
                   value={customerInfo.deliveryArea}
                   onChange={event => setCustomerInfo(prev => ({ ...prev, deliveryArea: event.target.value }))}
+                  required
                 >
                   <option value="">—Please choose an option—</option>
                   {deliveryAreas.map(area => <option key={area} value={area}>{area}</option>)}
