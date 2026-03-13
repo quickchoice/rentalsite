@@ -9,7 +9,7 @@ const DISCOUNT_PERCENT = 20;
 const DISCOUNT_MULTIPLIER = (100 - DISCOUNT_PERCENT) / 100;
 const validLocations = new Set(['charleston', 'myrtle-beach']);
 const parsedDeliveryFeeCents = Number(process.env.CHECKOUT_DELIVERY_FEE_CENTS || 0);
-const DELIVERY_FEE_CENTS = Number.isFinite(parsedDeliveryFeeCents) ? Math.max(0, Math.round(parsedDeliveryFeeCents)) : 1500;
+const DELIVERY_FEE_CENTS = Number.isFinite(parsedDeliveryFeeCents) ? Math.max(0, Math.round(parsedDeliveryFeeCents)) : 0;
 
 function normalizePromoCode(value) {
   if (typeof value !== 'string') return '';
