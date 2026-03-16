@@ -27,11 +27,11 @@ const DISCOUNTED_PRODUCT_IDS = new Set([
   'baby-swing',
   'baby-exersaucer',
   'baby-gates',
-  'beach-sun-shade',
+  'beach-chair',
+  'beach-chair-umbrella',
   'beach-umbrella',
   'beach-cart',
-  'beach-cargo-wagon',
-  'beach-kids-wagon'
+  'beach-wagon'
 ]);
 
 function getOriginalPrice(finalPrice) {
