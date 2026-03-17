@@ -229,13 +229,23 @@
   background: #f2f9ff;
   color: #1f4f7a;
   font-weight: 800;
-  padding: 0.52rem 0.95rem;
+  font-size: 1.02rem;
+  padding: 0.66rem 1.22rem;
+  box-shadow: 0 6px 16px rgba(31, 79, 122, 0.12);
   cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.locationBtn:hover,
+.locationBtn:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 9px 20px rgba(31, 79, 122, 0.18);
 }
 
 .locationBtnActive {
   background: linear-gradient(90deg, #133d66, #1f5f91);
   color: #fff;
+  box-shadow: 0 10px 20px rgba(19, 61, 102, 0.24);
 }
 
 .vendingLink {

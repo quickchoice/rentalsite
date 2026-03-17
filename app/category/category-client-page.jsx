@@ -46,21 +46,29 @@ export default function CategoryClientPage({ categoryId }) {
 
   const currentCategory = categories.find(category => category.id === categoryId) ?? categories[0];
 
+  const sortByPrice = (list, direction) => {
+    if (direction === 'price-asc') return [...list].sort((a, b) => a.pricePerDay - b.pricePerDay);
+    if (direction === 'price-desc') return [...list].sort((a, b) => b.pricePerDay - a.pricePerDay);
+    return list;
+  };
+
   const filteredProducts = useMemo(() => {
     const term = search.trim().toLowerCase();
-    let list = products.filter(
+    const list = products.filter(
       item => item.categoryId === currentCategory.id && item.name.toLowerCase().includes(term)
     );
 
-    if (sort === 'price-asc') list = [...list].sort((a, b) => a.pricePerDay - b.pricePerDay);
-    if (sort === 'price-desc') list = [...list].sort((a, b) => b.pricePerDay - a.pricePerDay);
-
-    return list;
+    return sortByPrice(list, sort);
   }, [currentCategory.id, search, sort]);
-  const featuredBundles = useMemo(
-    () => bundles.filter(bundle => bundle.categoryId === currentCategory.id),
-    [currentCategory.id]
-  );
+
+  const featuredBundles = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    const list = bundles.filter(
+      bundle => bundle.categoryId === currentCategory.id && bundle.name.toLowerCase().includes(term)
+    );
+
+    return sortByPrice(list, sort);
+  }, [currentCategory.id, search, sort]);
 
   return (
     <RentalsShell>
@@ -85,11 +93,14 @@ export default function CategoryClientPage({ categoryId }) {
 
           <div className={styles.filters}>
             <input value={search} onChange={event => setSearch(event.target.value)} placeholder="Search items" />
-            <select value={sort} onChange={event => setSort(event.target.value)}>
-              <option value="featured">Featured</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-            </select>
+            <div className={styles.selectWrap}>
+              <select value={sort} onChange={event => setSort(event.target.value)} aria-label="Sort items">
+                <option value="featured">Featured</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+              </select>
+              <span className={styles.selectArrow} aria-hidden="true">⌄</span>
+            </div>
           </div>
         </section>
 

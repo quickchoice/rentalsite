@@ -106,7 +106,7 @@ export default function HomePage() {
         <p>
           Baby gear and beach gear in Charleston & Myrtle Beach, clean, on-time, and effortless.
         </p>
-        <p className={styles.savingsTag}>Instant Savings on select items every day.</p>
+        <p className={styles.savingsTag}>Instant Savings on select items every day</p>
 
         <div className={styles.ctaRow}>
           <Link href="/category/baby" className={`${styles.cta} ${styles.ctaPrimary}`}>

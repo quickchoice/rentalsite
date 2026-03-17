@@ -90,6 +90,27 @@
   padding: 0.75rem;
 }
 
+.selectWrap {
+  position: relative;
+}
+
+.selectWrap select {
+  width: 100%;
+  appearance: none;
+  padding-right: 2rem;
+}
+
+.selectArrow {
+  position: absolute;
+  right: 0.7rem;
+  top: 50%;
+  transform: translateY(-53%);
+  color: #7c6742;
+  font-size: 1rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
 .sectionHeader {
   margin-top: 0.25rem;
   display: flex;
