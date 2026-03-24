@@ -2,6 +2,13 @@ import Link from 'next/link';
 import RentalsShell from '@/components/RentalsShell';
 import styles from '@/app/empty-cart/page.module.css';
 
+export const metadata = {
+  robots: {
+    index: false,
+    follow: false
+  }
+};
+
 export default function EmptyCartPage() {
   return (
     <RentalsShell>

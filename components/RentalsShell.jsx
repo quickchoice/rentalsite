@@ -1,7 +1,5 @@
 'use client';
 
-import CartBubble from '@/components/CartBubble';
-import CartDrawer from '@/components/CartDrawer';
 import UtilityHeader from '@/components/UtilityHeader';
 
 export default function RentalsShell({ children, backHref }) {
@@ -9,8 +7,6 @@ export default function RentalsShell({ children, backHref }) {
     <>
       <UtilityHeader backHref={backHref} />
       {children}
-      <CartBubble />
-      <CartDrawer />
     </>
   );
 }

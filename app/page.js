@@ -1,151 +1,199 @@
-'use client';
-
-import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import HomePageClient from '@/app/home-page-client';
+import StructuredData from '@/components/StructuredData';
 import styles from '@/app/page.module.css';
-import { useStore } from '@/context/StoreContext';
-import { locations } from '@/lib/data';
-import { withBasePath } from '@/lib/paths';
+import { faqPageFaqs, homePageContent } from '@/lib/seo-content';
+import { buildMetadata } from '@/lib/site';
+import {
+  buildFaqSchema,
+  buildLocalBusinessSchema,
+  buildOrganizationSchema
+} from '@/lib/structured-data';
 
-const navLinks = [
-  { href: '/category/baby', label: 'Baby Equipment' },
-  { href: '/category/beach', label: 'Beach Gear' },
-  { href: '/how-it-works', label: 'How It Works' },
-  { href: '/faq', label: 'FAQ' },
-  { href: '/contact', label: 'Contact Us' }
+export const metadata = buildMetadata({
+  title: 'Baby Gear, Beach Gear & Beach Wheelchair Rentals | QuickChoice Rentals',
+  description:
+    'QuickChoice Rentals delivers baby gear, beach gear, bundles, and beach wheelchair rentals in Myrtle Beach, SC and Charleston, SC.',
+  path: '/',
+  keywords: [
+    'baby gear rentals Myrtle Beach SC',
+    'beach gear rentals Myrtle Beach SC',
+    'beach wheelchair rentals Charleston SC',
+    'QuickChoice Rentals'
+  ]
+});
+
+const homeFaqs = faqPageFaqs.filter(item =>
+  [
+    'Where does QuickChoice Rentals deliver?',
+    'Are items cleaned between rentals?',
+    'How does delivery work?'
+  ].includes(item.question)
+);
+
+const categoryCards = [
+  {
+    ...homePageContent.popularPages.find(card => card.href === '/rentals/baby-gear'),
+    description: 'Cribs, strollers, high chairs, and the essentials that make travel easier.'
+  },
+  {
+    ...homePageContent.popularPages.find(card => card.href === '/rentals/beach-gear'),
+    description: 'Chairs, umbrellas, wagons, and beach-day basics delivered to your stay.'
+  },
+  {
+    ...homePageContent.popularPages.find(card => card.href === '/rentals/accessibility-equipment'),
+    description: 'Beach wheelchairs and mobility-friendly options for a smoother trip.'
+  },
+  {
+    ...homePageContent.popularPages.find(card => card.href === '/rentals/family-beach-bundle'),
+    title: 'Bundles',
+    description: 'Popular sets for families who want to book more in fewer clicks.'
+  }
 ];
 
-const trustItems = [
-  { icon: '/rentals/visual/trust-images/shield.svg', label: 'Sanitized & inspected' },
-  { icon: '/rentals/visual/trust-images/truck.svg', label: 'Delivery + pickup' },
-  { icon: '/rentals/visual/trust-images/chat.svg', label: 'Text support' },
-  { icon: '/rentals/visual/trust-images/pay.svg', label: 'Easy checkout' }
+const featuredCards = [
+  {
+    ...homePageContent.popularPages.find(card => card.href === '/rentals/crib-rentals'),
+    description: 'A full-size sleep setup without packing the bulky gear.'
+  },
+  {
+    ...homePageContent.popularPages.find(card => card.href === '/rentals/family-beach-bundle'),
+    title: 'Family Beach Bundle',
+    description: 'A simple way to cover the beach basics in one reservation.'
+  },
+  {
+    ...homePageContent.popularPages.find(card => card.href === '/rentals/beach-wheelchair-rentals'),
+    description: 'Reserve a beach wheelchair for easier access by the water.'
+  }
 ];
 
-const carouselImages = [
-  '/rentals/visual/carosel-images/Charleston1.jpg',
-  '/rentals/visual/carosel-images/charleston2.webp',
-  '/rentals/visual/carosel-images/charleston3.jpg',
-  '/rentals/visual/carosel-images/myrtle1.webp',
-  '/rentals/visual/carosel-images/myrtle2.jpg',
-  '/rentals/visual/carosel-images/crib.png'
+const locationCards = [
+  {
+    ...homePageContent.locations.find(card => card.href === '/locations/myrtle-beach-sc'),
+    title: 'Myrtle Beach',
+    description: 'Browse rentals available across the Grand Strand.'
+  },
+  {
+    ...homePageContent.locations.find(card => card.href === '/locations/charleston-sc'),
+    title: 'Charleston',
+    description: 'See what is available for Charleston-area stays.'
+  }
 ];
+
+function renderCard(card) {
+  return (
+    <article key={card.href} className={`${styles.contentCard} card`}>
+      {card.imageUrl ? (
+        <Link href={card.href} className={styles.cardImageWrap} aria-label={card.title}>
+          <img className={styles.cardImage} src={card.imageUrl} alt={card.imageAlt || card.title} loading="lazy" />
+        </Link>
+      ) : null}
+      <div className={styles.cardBody}>
+        <h3 className={styles.cardTitle}>
+          <Link href={card.href}>{card.title}</Link>
+        </h3>
+        <p className={styles.cardDescription}>{card.description}</p>
+      </div>
+    </article>
+  );
+}
 
 export default function HomePage() {
-  const { orderMeta, setLocation } = useStore();
-  const [slideIndex, setSlideIndex] = useState(0);
-  const [isTransitionEnabled, setIsTransitionEnabled] = useState(true);
-  const slides = [...carouselImages, carouselImages[0]];
-
-  const activeLocation = orderMeta.location || locations[0].id;
-
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      setSlideIndex(prev => prev + 1);
-    }, 2600);
-    return () => window.clearInterval(interval);
-  }, []);
-
-  function handleTransitionEnd() {
-    if (slideIndex !== carouselImages.length) return;
-    setIsTransitionEnabled(false);
-    setSlideIndex(0);
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        setIsTransitionEnabled(true);
-      });
-    });
-  }
-
   return (
-    <main className={styles.page}>
-      <header className={styles.topNav}>
-        <Link href="/" className={styles.logoWrap} aria-label="QuickChoice Rentals home">
-          <Image
-            src={withBasePath('/rentals/visual/logo.png')}
-            alt="QuickChoice Rentals"
-            width={210}
-            height={62}
-            className={styles.logo}
-            priority
-          />
-        </Link>
+    <>
+      <StructuredData data={buildOrganizationSchema()} />
+      <StructuredData
+        data={buildLocalBusinessSchema({
+          path: '/',
+          description:
+            'QuickChoice Rentals delivers baby gear, beach gear, bundles, and beach wheelchair rentals in Myrtle Beach, SC and Charleston, SC.'
+        })}
+      />
+      <StructuredData data={buildFaqSchema(homeFaqs)} />
 
-        <nav className={styles.navLinks} aria-label="Main navigation">
-          {navLinks.map(link => (
-            <Link key={link.label} href={link.href} className={styles.navLink}>
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-      </header>
+      <main className={styles.page}>
+        <HomePageClient />
 
-      <section className={styles.hero}>
-        <div className={styles.heroViewport}>
-          <div
-            className={`${styles.heroTrack} ${isTransitionEnabled ? styles.heroTrackAnimated : styles.heroTrackStatic}`}
-            style={{ transform: `translateX(-${slideIndex * 100}%)` }}
-            onTransitionEnd={handleTransitionEnd}
-          >
-            {slides.map((image, index) => (
-              <img
-                key={`${image}-${index}`}
-                className={styles.heroImage}
-                src={withBasePath(image)}
-                alt="Bright, clean vacation home interior"
-              />
-            ))}
-          </div>
+        <div className={styles.homeBody}>
+          <section className={styles.homeSection}>
+            <div className={styles.sectionHeading}>
+              <h2>Shop by Category</h2>
+              <p>Start with the gear you need most.</p>
+            </div>
+            <div className={styles.cardGrid}>
+              {categoryCards.map(renderCard)}
+            </div>
+          </section>
+
+          <section className={styles.homeSection}>
+            <div className={styles.sectionHeading}>
+              <h2>Locations</h2>
+              <p>Choose your area and start browsing.</p>
+            </div>
+            <div className={styles.cardGrid}>
+              {locationCards.map(renderCard)}
+            </div>
+          </section>
+
+          <section className={`${styles.coveragePanel} card`}>
+            <div className={styles.sectionHeading}>
+              <h2>Delivered to Your Stay</h2>
+              <p>Simple delivery and pickup for Myrtle Beach and Charleston trips.</p>
+            </div>
+            <div className={styles.coverageGrid}>
+              <article className={styles.coverageItem}>
+                <h3>Myrtle Beach</h3>
+                <p>Gear for family beach trips, condo stays, and vacation rentals across the Grand Strand.</p>
+              </article>
+              <article className={styles.coverageItem}>
+                <h3>Charleston</h3>
+                <p>Delivered for Charleston-area stays so you can travel lighter and settle in faster.</p>
+              </article>
+              <article className={styles.coverageItem}>
+                <h3>Pickup Included</h3>
+                <p>Your rental is dropped off before or at arrival and picked up when the trip ends.</p>
+              </article>
+            </div>
+          </section>
+
+          <section className={styles.homeSection}>
+            <div className={styles.sectionHeading}>
+              <h2>Popular Bundles & Favorites</h2>
+              <p>A few easy starting points for faster booking.</p>
+            </div>
+            <div className={styles.cardGrid}>
+              {featuredCards.map(renderCard)}
+            </div>
+          </section>
+
+          <section className={styles.homeSection}>
+            <div className={styles.sectionHeading}>
+              <h2>FAQ</h2>
+              <p>Quick answers before you book.</p>
+            </div>
+            <div className={styles.faqGrid}>
+              {homeFaqs.map(item => (
+                <article key={item.question} className={`${styles.faqCard} card`}>
+                  <h3>{item.question}</h3>
+                  <p>{item.answer}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className={`${styles.ctaPanel} card`}>
+            <h2>Start browsing rentals</h2>
+            <div className={styles.ctaPanelLinks}>
+              <Link href="/rentals" className="btn btnPrimary">
+                Browse Rentals
+              </Link>
+              <Link href="/locations/myrtle-beach-sc" className="btn btnSecondary">
+                View Locations
+              </Link>
+            </div>
+          </section>
         </div>
-        <div className={styles.heroFade} aria-hidden="true" />
-      </section>
-
-      <section className={styles.intro}>
-        <h1>Vacation essentials, delivered to your door.</h1>
-        <p>
-          Baby gear and beach gear in Charleston & Myrtle Beach, clean, on-time, and effortless.
-        </p>
-        <p className={styles.savingsTag}>Instant Savings on select items every day</p>
-
-        <div className={styles.ctaRow}>
-          <Link href="/category/baby" className={`${styles.cta} ${styles.ctaPrimary}`}>
-            Browse Baby Gear
-          </Link>
-          <Link href="/category/beach" className={`${styles.cta} ${styles.ctaSecondary}`}>
-            Browse Beach Gear
-          </Link>
-        </div>
-
-        <div className={styles.locationPicker}>
-          <p>Select your service area</p>
-          <div className={styles.locationButtons}>
-            {locations.map(location => (
-              <button
-                key={location.id}
-                type="button"
-                className={`${styles.locationBtn} ${activeLocation === location.id ? styles.locationBtnActive : ''}`}
-                onClick={() => setLocation(location.id)}
-              >
-                {location.name}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <ul className={styles.trustRow}>
-          {trustItems.map(item => (
-            <li key={item.label} className={styles.trustItem}>
-              <img src={withBasePath(item.icon)} alt="" aria-hidden="true" />
-              <span>{item.label}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <Link href="/vending" className={styles.vendingLink}>
-        Looking for vending?
-      </Link>
-    </main>
+      </main>
+    </>
   );
 }

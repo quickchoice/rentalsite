@@ -8,6 +8,13 @@ import { bundles, products } from '@/lib/data';
 import { formatMoney, getBundleBasePricePerDay } from '@/lib/cart';
 import { useStore } from '@/context/StoreContext';
 
+const seoPageByBundleId = {
+  'bundle-baby-basics': '/rentals/baby-basics-bundle',
+  'bundle-baby-sleep': '/rentals/sleep-essentials-bundle',
+  'bundle-baby-travel-safety': '/rentals/car-safety-bundle',
+  'bundle-beach-day': '/rentals/family-beach-bundle'
+};
+
 export default function BundleClientPage({ bundleId }) {
   const { addBundle } = useStore();
   const [qty, setQty] = useState(1);
@@ -15,6 +22,7 @@ export default function BundleClientPage({ bundleId }) {
   const bundle = useMemo(() => bundles.find(item => item.id === bundleId) ?? bundles[0], [bundleId]);
   const basePricePerDay = getBundleBasePricePerDay(bundle);
   const discountPercent = bundle.discountPercent || 10;
+  const seoHref = seoPageByBundleId[bundle.id] || '/rentals/bundles';
 
   return (
     <RentalsShell backHref={`/category/${bundle.categoryId || 'baby'}`}>
@@ -56,6 +64,17 @@ export default function BundleClientPage({ bundleId }) {
                   );
                 })}
               </ul>
+            </div>
+
+            <div className={styles.section}>
+              <h2>Related Rental Pages</h2>
+              <p className="muted">
+                Want the matching overview page? <Link href={seoHref}>See the related bundle page</Link>.
+              </p>
+              <p className="muted">
+                You can also compare <Link href="/locations/myrtle-beach-sc">Myrtle Beach rentals</Link> and{' '}
+                <Link href="/locations/charleston-sc">Charleston rentals</Link>.
+              </p>
             </div>
 
             <Link href={`/category/${bundle.categoryId || 'baby'}`} className="btn btnSecondary">Back to category</Link>

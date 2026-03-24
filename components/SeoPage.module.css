@@ -1,0 +1,307 @@
+.page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.breadcrumbs a {
+  color: var(--accent);
+}
+
+.breadcrumbs span[aria-hidden='true'] {
+  opacity: 0.5;
+}
+
+.hero {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1.5rem;
+}
+
+.heroInner {
+  display: grid;
+  gap: 1rem;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--accent);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+}
+
+.hero h1 {
+  margin: 0;
+  color: var(--accent);
+  font-size: clamp(2rem, 4vw, 3.35rem);
+  line-height: 1.06;
+}
+
+.intro {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.intro p {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.02rem;
+  line-height: 1.72;
+}
+
+.ctaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.heroNote {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.answerGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.answerCard {
+  padding: 1rem;
+  border: 1px solid rgba(31, 91, 150, 0.18);
+  border-radius: var(--radius);
+  background: rgba(247, 252, 255, 0.9);
+}
+
+.answerCard h2,
+.answerCard h3 {
+  margin: 0 0 0.45rem;
+  font-size: 1.2rem;
+}
+
+.answerCard p {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.65;
+}
+
+.keyList {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.55rem;
+  color: var(--text-primary);
+}
+
+.section {
+  display: grid;
+  gap: 1rem;
+}
+
+.sectionHeader {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  font-size: clamp(1.55rem, 2.7vw, 2.2rem);
+}
+
+.sectionHeader p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.contentBlock {
+  padding: 1.25rem;
+}
+
+.contentBlock h3 {
+  margin: 0 0 0.6rem;
+  font-size: 1.25rem;
+}
+
+.contentBlock p {
+  margin: 0;
+  line-height: 1.72;
+}
+
+.contentBlock ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.contentGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+}
+
+.cardGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+
+.card {
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.imageWrap {
+  aspect-ratio: 4 / 3;
+  background: rgba(255, 255, 255, 0.88);
+  border-bottom: 1px solid rgba(31, 91, 150, 0.12);
+}
+
+.galleryWrap {
+  padding: 0.7rem;
+}
+
+.galleryGrid {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.galleryImage {
+  width: 100%;
+  height: 100%;
+  min-height: 5.4rem;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  display: block;
+  background: #fff;
+}
+
+.cardBody {
+  display: grid;
+  gap: 0.65rem;
+  padding: 1rem;
+}
+
+.cardMeta {
+  margin: 0;
+  color: var(--accent-warm);
+  font-weight: 800;
+  font-size: 0.86rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--accent);
+}
+
+.cardTitleLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.cardDescription {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.65;
+}
+
+.cardLink {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.faqList {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.faqItem {
+  padding: 1rem 1.1rem;
+}
+
+.faqItem h3 {
+  margin: 0 0 0.45rem;
+  font-size: 1.16rem;
+}
+
+.faqItem p {
+  margin: 0;
+  line-height: 1.68;
+}
+
+.relatedGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+
+.relatedCard {
+  padding: 1rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.relatedCard h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.relatedCard p {
+  margin: 0;
+  line-height: 1.65;
+  color: var(--text-primary);
+}
+
+.footerCta {
+  padding: 1.35rem;
+  display: grid;
+  gap: 0.8rem;
+  text-align: center;
+}
+
+.footerCta h2 {
+  margin: 0;
+}
+
+.footerCta p {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.65;
+}
+
+@media (max-width: 720px) {
+  .hero {
+    padding: 1.15rem;
+  }
+
+  .contentBlock {
+    padding: 1rem;
+  }
+}

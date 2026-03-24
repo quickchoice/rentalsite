@@ -9,6 +9,20 @@ import { formatMoney, getBundleBasePricePerDay } from '@/lib/cart';
 import { useStore } from '@/context/StoreContext';
 
 const DISCOUNT_PERCENT = 30;
+const seoHubByCategory = {
+  baby: '/rentals/baby-gear',
+  beach: '/rentals/beach-gear'
+};
+const locationSeoLinksByCategory = {
+  baby: [
+    { href: '/locations/myrtle-beach-sc/baby-gear-rentals', label: 'Myrtle Beach baby gear' },
+    { href: '/locations/charleston-sc/baby-gear-rentals', label: 'Charleston baby gear' }
+  ],
+  beach: [
+    { href: '/locations/myrtle-beach-sc/beach-gear-rentals', label: 'Myrtle Beach beach gear' },
+    { href: '/locations/charleston-sc/beach-gear-rentals', label: 'Charleston beach gear' }
+  ]
+};
 const DISCOUNTED_PRODUCT_IDS = new Set([
   'baby-cribs',
   'baby-bassinet',
@@ -86,6 +100,17 @@ export default function CategoryClientPage({ categoryId }) {
                   className={`${styles.tab} ${category.id === currentCategory.id ? styles.tabActive : ''}`}
                 >
                   {category.name}
+                </Link>
+              ))}
+            </div>
+            <p className={`${styles.locationNote} muted`}>
+              Available in Myrtle Beach and Charleston. Want the full overview?{' '}
+              <Link href={seoHubByCategory[currentCategory.id] || '/rentals'}>See the {currentCategory.name.toLowerCase()} overview</Link>.
+            </p>
+            <div className={styles.locationRow}>
+              {(locationSeoLinksByCategory[currentCategory.id] || []).map(link => (
+                <Link key={link.href} href={link.href} className={styles.locationBtn}>
+                  {link.label}
                 </Link>
               ))}
             </div>

@@ -8,6 +8,22 @@ import { categories, products } from '@/lib/data';
 import { formatMoney } from '@/lib/cart';
 import { useStore } from '@/context/StoreContext';
 
+const seoPageByProductId = {
+  'baby-cribs': '/rentals/crib-rentals',
+  'baby-pack-n-play': '/rentals/pack-and-play-rentals',
+  'baby-high-chair-tray': '/rentals/high-chair-rentals',
+  'baby-booster-seat-tray': '/rentals/high-chair-rentals',
+  'baby-single-jogging-stroller': '/rentals/stroller-rentals',
+  'baby-double-jogging-stroller': '/rentals/stroller-rentals',
+  'baby-tandem-double-stroller': '/rentals/stroller-rentals',
+  'beach-chair': '/rentals/beach-chair-rentals',
+  'beach-chair-umbrella': '/rentals/beach-chair-rentals',
+  'beach-umbrella': '/rentals/umbrella-rentals',
+  'beach-wagon': '/rentals/beach-wagon-rentals',
+  'beach-cart': '/rentals/beach-wagon-rentals',
+  'beach-wheelchair': '/rentals/beach-wheelchair-rentals'
+};
+
 export default function ProductClientPage({ productId }) {
   const { addToCart } = useStore();
   const [qty, setQty] = useState(1);
@@ -17,6 +33,7 @@ export default function ProductClientPage({ productId }) {
   }, [productId]);
 
   const categoryName = categories.find(category => category.id === product.categoryId)?.name ?? 'Category';
+  const seoHref = seoPageByProductId[product.id] || (product.categoryId === 'beach' ? '/rentals/beach-gear' : '/rentals/baby-gear');
   return (
     <RentalsShell backHref={`/category/${product.categoryId}`}>
       <main>
@@ -49,6 +66,17 @@ export default function ProductClientPage({ productId }) {
             <div className={styles.section}>
               <h2>What's Included</h2>
               <p className="muted">{product.longDescription}</p>
+            </div>
+
+            <div className={styles.section}>
+              <h2>Related Rental Pages</h2>
+              <p className="muted">
+                Want a broader overview before you book? <Link href={seoHref}>See the related rental page</Link>.
+              </p>
+              <p className="muted">
+                You can also compare <Link href="/locations/myrtle-beach-sc">Myrtle Beach rentals</Link> and{' '}
+                <Link href="/locations/charleston-sc">Charleston rentals</Link>.
+              </p>
             </div>
 
             <Link href={`/category/${product.categoryId}`} className="btn btnSecondary">Back to category</Link>

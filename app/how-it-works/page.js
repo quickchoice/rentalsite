@@ -1,24 +1,37 @@
 import Link from 'next/link';
 import RentalsShell from '@/components/RentalsShell';
 import styles from '@/app/how-it-works/page.module.css';
+import { buildMetadata } from '@/lib/site';
 
 const steps = [
   {
     icon: '📅',
     title: 'Choose Dates',
-    text: 'Pick your vacation start and end dates before shopping so pricing stays accurate.'
+    text: 'Enter your trip dates so pricing and availability line up with your stay.'
   },
   {
     icon: '🛍️',
     title: 'Add Your Gear',
-    text: 'Browse baby and beach essentials, then add exactly what your trip needs.'
+    text: 'Browse baby gear, beach gear, bundles, or beach wheelchair options and add what you need.'
   },
   {
     icon: '🚚',
     title: 'We Deliver',
-    text: 'We bring cleaned, inspected gear to your rental and handle pickup at checkout.'
+    text: 'Your gear is delivered to your stay and picked up when the trip ends.'
   }
 ];
+
+export const metadata = buildMetadata({
+  title: 'How QuickChoice Rentals Works | Myrtle Beach & Charleston Delivery',
+  description:
+    'Learn how to book baby gear, beach gear, bundles, and beach wheelchair rentals from QuickChoice Rentals.',
+  path: '/how-it-works',
+  keywords: [
+    'how QuickChoice Rentals works',
+    'Myrtle Beach rental delivery',
+    'Charleston rental delivery'
+  ]
+});
 
 export default function HowItWorksPage() {
   return (
@@ -26,7 +39,7 @@ export default function HowItWorksPage() {
       <main>
         <section className={`${styles.card} card`}>
           <h1>How It Works</h1>
-          <p className="muted">Fast setup, simple delivery, and no extra travel-day stress.</p>
+          <p className="muted">Choose dates, add your gear, and we handle delivery and pickup.</p>
 
           <div className={styles.steps}>
             {steps.map(step => (

@@ -1,0 +1,140 @@
+.wrap {
+  position: fixed;
+  right: 6.2rem;
+  bottom: 1.2rem;
+  z-index: 96;
+  display: grid;
+  justify-items: end;
+  gap: 0.8rem;
+}
+
+.bubble {
+  border: 1px solid #d29c67;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff4e3, #ffd7ad);
+  color: #7d3f11;
+  min-height: 3.6rem;
+  padding: 0.8rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  box-shadow: 0 10px 24px rgba(25, 76, 110, 0.24);
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.bubble:hover,
+.bubble:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(25, 76, 110, 0.28);
+}
+
+.bubbleIcon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.bubbleLabel {
+  font-weight: 800;
+  font-size: 0.98rem;
+  line-height: 1;
+}
+
+.panel {
+  width: min(24rem, calc(100vw - 2rem));
+  padding: 1rem;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 0.9rem;
+}
+
+.panelHeader h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.panelHeader p {
+  margin: 0.25rem 0 0;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.close {
+  border: 0;
+  background: transparent;
+  color: #496179;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.form label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #27425d;
+}
+
+.form input,
+.form select,
+.form textarea {
+  width: 100%;
+  border: 1px solid rgba(31, 91, 150, 0.22);
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.92);
+  color: #1e3347;
+  padding: 0.75rem 0.85rem;
+  font: inherit;
+}
+
+.form textarea {
+  resize: vertical;
+  min-height: 6.5rem;
+}
+
+.submit {
+  justify-content: center;
+}
+
+.success,
+.error {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.success {
+  color: #1d6b49;
+}
+
+.error {
+  color: #a12727;
+}
+
+@media (max-width: 760px) {
+  .wrap {
+    right: 5.8rem;
+    bottom: 0.9rem;
+  }
+
+  .bubble {
+    min-height: 3.35rem;
+    padding: 0.75rem 0.9rem;
+  }
+
+  .bubbleLabel {
+    font-size: 0.9rem;
+  }
+}
