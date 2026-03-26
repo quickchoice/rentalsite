@@ -2,19 +2,34 @@
 
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import RentalsShell from '@/components/RentalsShell';
 import styles from '@/app/checkout/success/page.module.css';
 import { useStore } from '@/context/StoreContext';
 
 export default function CheckoutSuccessPage() {
+  const searchParams = useSearchParams();
   const { ready, clearCart } = useStore();
   const hasClearedCart = useRef(false);
+  const hasTrackedConversion = useRef(false);
 
   useEffect(() => {
     if (!ready || hasClearedCart.current) return;
     clearCart();
     hasClearedCart.current = true;
   }, [ready, clearCart]);
+
+  useEffect(() => {
+    if (hasTrackedConversion.current) return;
+    if (typeof window === 'undefined' || typeof window.gtag !== 'function') return;
+
+    window.gtag('event', 'conversion', {
+      send_to: 'AW-18041825199/fQh6CKSqp5AcEK_PgZtD',
+      transaction_id: searchParams.get('session_id') || ''
+    });
+
+    hasTrackedConversion.current = true;
+  }, [searchParams]);
 
   return (
     <RentalsShell>
