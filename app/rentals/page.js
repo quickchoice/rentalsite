@@ -8,7 +8,7 @@ import {
 } from '@/lib/structured-data';
 
 export const metadata = buildMetadata({
-  title: 'Vacation Rentals in Myrtle Beach & Charleston | QuickChoice Rentals',
+  title: 'Baby & Beach Gear Rentals in Myrtle Beach & Charleston | QuickChoice Rentals',
   description:
     'Explore baby gear rentals, beach gear rentals, accessibility equipment, and bundles for Myrtle Beach and Charleston, SC.',
   path: '/rentals',
@@ -164,9 +164,10 @@ export default function RentalsHubPage() {
   return (
     <SeoPage
       breadcrumbs={breadcrumbs}
-      title="Vacation Rentals in Myrtle Beach & Charleston"
+      title="Baby & Beach Gear Rentals for Myrtle Beach & Charleston"
       intro={[
-        'Browse baby gear, beach gear, bundles, and beach wheelchair rentals for Myrtle Beach and Charleston.'
+        'Find the gear families actually need for the trip: baby equipment, beach setup essentials, beach wheelchairs, and simple bundle options.',
+        'If you want to pack less and have the basics ready when you arrive, start with the category that matches your stay.'
       ]}
       heroCtas={[
         { href: '/category/baby', label: 'Browse Baby Gear' },
@@ -191,7 +192,7 @@ export default function RentalsHubPage() {
       footerCta={{
         title: 'Ready to start your rental?',
         text:
-          'Browse the collections first, then choose dates when you are ready to book.',
+          'Browse the main collections, then choose your dates when you are ready to book.',
         links: [
           { href: '/checkout', label: 'Choose Dates' },
           { href: '/', label: 'Back to Home', kind: 'secondary' }
