@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getDayCount, parseDateLocal } from '@/lib/cart';
+import { DEFAULT_DELIVERY_FEE_CENTS, getDayCount, parseDateLocal } from '@/lib/cart';
 import { bundles, products } from '@/lib/data';
 
 const productById = new Map(products.map(product => [product.id, product]));
@@ -8,8 +8,10 @@ const MAX_QTY_PER_LINE = 25;
 const DISCOUNT_PERCENT = 20;
 const DISCOUNT_MULTIPLIER = (100 - DISCOUNT_PERCENT) / 100;
 const validLocations = new Set(['charleston', 'myrtle-beach']);
-const parsedDeliveryFeeCents = Number(process.env.CHECKOUT_DELIVERY_FEE_CENTS || 0);
-const DELIVERY_FEE_CENTS = Number.isFinite(parsedDeliveryFeeCents) ? Math.max(0, Math.round(parsedDeliveryFeeCents)) : 0;
+const parsedDeliveryFeeCents = Number(process.env.CHECKOUT_DELIVERY_FEE_CENTS || DEFAULT_DELIVERY_FEE_CENTS);
+const DELIVERY_FEE_CENTS = Number.isFinite(parsedDeliveryFeeCents)
+  ? Math.max(0, Math.round(parsedDeliveryFeeCents))
+  : DEFAULT_DELIVERY_FEE_CENTS;
 
 function normalizePromoCode(value) {
   if (typeof value !== 'string') return '';
@@ -190,7 +192,7 @@ export async function POST(request) {
     !customerInfo.deliveryArea
   ) {
     return NextResponse.json(
-      { error: 'Name, email, address, zip code, state, and city are required before checkout.' },
+      { error: 'Name, email, delivery address, zip code, state, and city are required before checkout.' },
       { status: 400 }
     );
   }

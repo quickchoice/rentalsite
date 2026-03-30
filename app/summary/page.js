@@ -68,7 +68,7 @@ export default function SummaryPage() {
       !customerInfo.state.trim() ||
       !customerInfo.deliveryArea.trim()
     ) {
-      setError('Please complete all required contact and city fields.');
+      setError('Please complete all required contact, delivery address, and city fields.');
       return;
     }
 
@@ -165,7 +165,7 @@ export default function SummaryPage() {
           </div>
 
           <div className={styles.subtotal}><span>Rental subtotal</span><strong>{formatMoney(subtotal)}</strong></div>
-          <div className={styles.subtotal}><span>Delivery fee</span><strong>{formatMoney(deliveryFee)}</strong></div>
+          <div className={styles.subtotal}><span>Flat delivery fee</span><strong>{formatMoney(deliveryFee)}</strong></div>
           <div className={styles.subtotal}><span>Total</span><strong>{formatMoney(totalWithDelivery)}</strong></div>
           <div className={styles.contactBlock}>
             <h2>Contact Info</h2>
@@ -197,11 +197,12 @@ export default function SummaryPage() {
                 />
               </label>
               <label>
-                Address (required)
+                Delivery Address (required)
                 <input
                   type="text"
                   value={customerInfo.address}
                   onChange={event => setCustomerInfo(prev => ({ ...prev, address: event.target.value }))}
+                  placeholder="Hotel, condo, or home delivery address"
                   required
                 />
               </label>
@@ -263,7 +264,7 @@ export default function SummaryPage() {
               </label>
             </div>
           </div>
-          <p className="muted">Secure checkout is handled by Stripe.</p>
+          <p className="muted">Secure checkout is handled by Stripe. A flat {formatMoney(deliveryFee)} delivery fee is included.</p>
           {error && <p className={styles.error}>{error}</p>}
           <button type="button" className="btn btnPrimary" onClick={onPayNow} disabled={isSubmitting}>
             {isSubmitting ? 'Redirecting...' : 'Pay Now'}

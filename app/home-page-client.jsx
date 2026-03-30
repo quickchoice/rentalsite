@@ -111,6 +111,13 @@ export default function HomePageClient() {
           </Link>
         </div>
 
+        <p className={styles.datePrompt}>
+          Already know your trip window?{' '}
+          <Link href="/checkout" className={styles.dateLink}>
+            Choose your dates
+          </Link>
+        </p>
+
         <ul className={styles.trustRow}>
           {trustItems.map(item => (
             <li key={item.label} className={styles.trustItem}>
