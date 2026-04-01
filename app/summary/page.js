@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import RentalsShell from '@/components/RentalsShell';
 import styles from '@/app/summary/page.module.css';
 import { useStore } from '@/context/StoreContext';
-import { formatMoney, getBundleBasePricePerDay, getBundleById, getDayCount, getDeliveryFee, getProductById } from '@/lib/cart';
+import { formatMoney, getBundleBasePricePerDay, getBundleById, getDayCount, getDeliveryFee, getExpediteFee, getProductById, isExpeditedOrder } from '@/lib/cart';
 import { locations } from '@/lib/data';
 import { withBasePath } from '@/lib/paths';
 
@@ -27,7 +27,9 @@ export default function SummaryPage() {
   });
   const days = getDayCount(orderMeta);
   const deliveryFee = getDeliveryFee(cart);
-  const totalWithDelivery = subtotal + deliveryFee;
+  const expediteFee = getExpediteFee(orderMeta);
+  const totalWithFees = subtotal + deliveryFee + expediteFee;
+  const isRushOrder = isExpeditedOrder(orderMeta);
   const locationName = locations.find(location => location.id === orderMeta.location)?.name || 'Not selected';
   const deliveryAreas = [
     'Charleston',
@@ -166,7 +168,10 @@ export default function SummaryPage() {
 
           <div className={styles.subtotal}><span>Rental subtotal</span><strong>{formatMoney(subtotal)}</strong></div>
           <div className={styles.subtotal}><span>Flat delivery fee</span><strong>{formatMoney(deliveryFee)}</strong></div>
-          <div className={styles.subtotal}><span>Total</span><strong>{formatMoney(totalWithDelivery)}</strong></div>
+          {isRushOrder && (
+            <div className={styles.subtotal}><span>Expedite fee</span><strong>{formatMoney(expediteFee)}</strong></div>
+          )}
+          <div className={styles.subtotal}><span>Total</span><strong>{formatMoney(totalWithFees)}</strong></div>
           <div className={styles.contactBlock}>
             <h2>Contact Info</h2>
             <div className={styles.contactGrid}>
@@ -264,7 +269,10 @@ export default function SummaryPage() {
               </label>
             </div>
           </div>
-          <p className="muted">Secure checkout is handled by Stripe. A flat {formatMoney(deliveryFee)} delivery fee is included.</p>
+          <p className="muted">
+            Secure checkout is handled by Stripe. A flat {formatMoney(deliveryFee)} delivery fee is included
+            {isRushOrder ? `, plus a ${formatMoney(expediteFee)} expedite fee for orders within 24 hours.` : '.'}
+          </p>
           {error && <p className={styles.error}>{error}</p>}
           <button type="button" className="btn btnPrimary" onClick={onPayNow} disabled={isSubmitting}>
             {isSubmitting ? 'Redirecting...' : 'Pay Now'}

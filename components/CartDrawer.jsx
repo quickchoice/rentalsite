@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import styles from '@/components/CartDrawer.module.css';
 import { useStore } from '@/context/StoreContext';
-import { formatMoney, getBundleBasePricePerDay, getBundleById, getDayCount, getDeliveryFee, getProductById } from '@/lib/cart';
+import { formatMoney, getBundleBasePricePerDay, getBundleById, getDayCount, getDeliveryFee, getExpediteFee, getProductById, isExpeditedOrder } from '@/lib/cart';
 import { locations } from '@/lib/data';
 
 export default function CartDrawer() {
@@ -40,7 +40,9 @@ export default function CartDrawer() {
     return sum + product.pricePerDay * discountMultiplier * line.qty;
   }, 0);
   const deliveryFee = getDeliveryFee(cart);
-  const totalWithDelivery = subtotal + deliveryFee;
+  const expediteFee = getExpediteFee(orderMeta);
+  const totalWithFees = subtotal + deliveryFee + expediteFee;
+  const isRushOrder = isExpeditedOrder(orderMeta);
 
   function onStartDateChange(value) {
     const next = { ...orderMeta, startDate: value };
@@ -166,7 +168,10 @@ export default function CartDrawer() {
           <div className={styles.subtotal}><span>Per-day subtotal</span><strong>{formatMoney(dailySubtotal)}</strong></div>
           <div className={styles.subtotal}><span>Trip subtotal</span><strong>{formatMoney(subtotal)}</strong></div>
           <div className={styles.subtotal}><span>Flat delivery fee</span><strong>{formatMoney(deliveryFee)}</strong></div>
-          <div className={styles.subtotal}><span>Total</span><strong>{formatMoney(totalWithDelivery)}</strong></div>
+          {isRushOrder && (
+            <div className={styles.subtotal}><span>Expedite fee</span><strong>{formatMoney(expediteFee)}</strong></div>
+          )}
+          <div className={styles.subtotal}><span>Total</span><strong>{formatMoney(totalWithFees)}</strong></div>
           <Link
             href={checkoutHref}
             className={`${styles.checkout} ${cannotCheckout ? styles.checkoutDisabled : ''}`}
@@ -188,6 +193,11 @@ export default function CartDrawer() {
                 : needsLocation
                 ? 'Select Charleston or Myrtle Beach.'
                 : 'Select start and end dates to continue.'}
+            </p>
+          )}
+          {!cannotCheckout && isRushOrder && (
+            <p className={styles.checkoutHint}>
+              Orders starting within 24 hours include a {formatMoney(expediteFee)} expedite fee.
             </p>
           )}
         </div>

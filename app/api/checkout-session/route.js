@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { DEFAULT_DELIVERY_FEE_CENTS, getDayCount, parseDateLocal } from '@/lib/cart';
+import { DEFAULT_DELIVERY_FEE_CENTS, DEFAULT_EXPEDITE_FEE_CENTS, getDayCount, isExpeditedOrder, parseDateLocal } from '@/lib/cart';
 import { bundles, products } from '@/lib/data';
 
 const productById = new Map(products.map(product => [product.id, product]));
@@ -12,6 +12,10 @@ const parsedDeliveryFeeCents = Number(process.env.CHECKOUT_DELIVERY_FEE_CENTS ||
 const DELIVERY_FEE_CENTS = Number.isFinite(parsedDeliveryFeeCents)
   ? Math.max(0, Math.round(parsedDeliveryFeeCents))
   : DEFAULT_DELIVERY_FEE_CENTS;
+const parsedExpediteFeeCents = Number(process.env.CHECKOUT_EXPEDITE_FEE_CENTS || DEFAULT_EXPEDITE_FEE_CENTS);
+const EXPEDITE_FEE_CENTS = Number.isFinite(parsedExpediteFeeCents)
+  ? Math.max(0, Math.round(parsedExpediteFeeCents))
+  : DEFAULT_EXPEDITE_FEE_CENTS;
 
 function normalizePromoCode(value) {
   if (typeof value !== 'string') return '';
@@ -65,7 +69,7 @@ function sanitizeCart(cart) {
   return [...normalizedProducts, ...normalizedBundles];
 }
 
-function buildStripeCheckoutParams({ lineItems, orderMeta, customerInfo, dayCount, origin, promoApplied }) {
+function buildStripeCheckoutParams({ lineItems, orderMeta, customerInfo, dayCount, origin, promoApplied, expediteFeeCents }) {
   const params = new URLSearchParams();
 
   params.set('mode', 'payment');
@@ -78,6 +82,7 @@ function buildStripeCheckoutParams({ lineItems, orderMeta, customerInfo, dayCoun
   params.set('metadata[location]', orderMeta.location);
   params.set('metadata[day_count]', String(dayCount));
   params.set('metadata[delivery_fee_cents]', String(DELIVERY_FEE_CENTS));
+  params.set('metadata[expedite_fee_cents]', String(expediteFeeCents));
   params.set('metadata[customer_name]', metaValue(customerInfo.name));
   params.set('metadata[customer_email]', metaValue(customerInfo.email));
   params.set('metadata[customer_phone]', metaValue(customerInfo.phone));
@@ -120,6 +125,18 @@ function buildStripeCheckoutParams({ lineItems, orderMeta, customerInfo, dayCoun
     params.set(
       `line_items[${deliveryIndex}][price_data][product_data][description]`,
       'Flat delivery fee (not charged per rental day)'
+    );
+  }
+
+  if (expediteFeeCents > 0) {
+    const expediteIndex = lineItems.length + (DELIVERY_FEE_CENTS > 0 ? 1 : 0);
+    params.set(`line_items[${expediteIndex}][quantity]`, '1');
+    params.set(`line_items[${expediteIndex}][price_data][currency]`, 'usd');
+    params.set(`line_items[${expediteIndex}][price_data][unit_amount]`, String(expediteFeeCents));
+    params.set(`line_items[${expediteIndex}][price_data][product_data][name]`, 'Expedite fee');
+    params.set(
+      `line_items[${expediteIndex}][price_data][product_data][description]`,
+      'Rush order fee for bookings starting within 24 hours'
     );
   }
 
@@ -209,6 +226,7 @@ export async function POST(request) {
   }
 
   const dayCount = getDayCount(orderMeta);
+  const expediteFeeCents = isExpeditedOrder(orderMeta) ? EXPEDITE_FEE_CENTS : 0;
   const lineItems = cart.map(line => {
     if (line.type === 'bundle') {
       const bundle = bundleById.get(line.bundleId);
@@ -262,7 +280,8 @@ export async function POST(request) {
     customerInfo,
     dayCount,
     origin,
-    promoApplied
+    promoApplied,
+    expediteFeeCents
   });
 
   let stripeResponse;
