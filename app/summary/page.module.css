@@ -96,6 +96,16 @@
   font-weight: 600;
 }
 
+.disclaimer {
+  margin: 0;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid rgba(191, 134, 58, 0.35);
+  border-radius: 0.65rem;
+  background: rgba(255, 248, 232, 0.9);
+  color: #5f4320;
+  font-size: 0.95rem;
+}
+
 .oldPrice {
   text-decoration: line-through;
   opacity: 0.72;

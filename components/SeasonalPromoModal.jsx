@@ -65,10 +65,10 @@ export default function SeasonalPromoModal() {
           </p>
 
           <div className={styles.deals}>
-            <p><strong>$20 off</strong> orders over $295</p>
-            <p><strong>$30 off</strong> orders over $395</p>
-            <p><strong>$40 off</strong> orders over $495</p>
-            <p><strong>$50 off</strong> orders over $595</p>
+            <p><strong>$50 off</strong> orders over $295</p>
+            <p><strong>$75 off</strong> orders over $395</p>
+            <p><strong>$100 off</strong> orders over $495</p>
+            <p><strong>$150 off</strong> orders over $595</p>
           </div>
 
           <button type="button" className={`btn btnSecondary ${styles.cta}`} onClick={closeModal}>

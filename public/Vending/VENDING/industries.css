@@ -21,6 +21,7 @@
   width:100%;
   height:240px;
   object-fit:cover;
+  object-position:center;
   opacity:.92;
   transition:transform .35s ease, opacity .25s ease;
 }
@@ -72,6 +73,11 @@
 
 /* Mobile: full width CTA */
 @media (max-width:720px){
+  .ind-card img{
+    height:220px;
+    object-position:center top;
+  }
+
   .ind-cta-box{
     width:90%;
     border-radius:var(--r-xl);

@@ -94,3 +94,9 @@
   margin: 8px 0 24px;
   text-align: center;
 }
+
+@media (max-width:720px){
+  .feature__media.photo img{
+    object-position:center top;
+  }
+}

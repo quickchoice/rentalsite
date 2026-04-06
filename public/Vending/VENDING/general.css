@@ -223,6 +223,22 @@ img{ max-width:100%; height:auto; display:block; }
   }
 }
 
+@media (max-width:720px){
+  .t-img-card img{
+    height:200px;
+    object-position:center top;
+  }
+
+  .op-frame{
+    height:auto;
+    aspect-ratio:4 / 3;
+  }
+
+  .op-frame img{
+    object-position:center top;
+  }
+}
+
 /* Partnership layout helper (center art with ring of cards) */
 .ring{
   display:grid; gap:14px;

@@ -273,6 +273,9 @@ export default function SummaryPage() {
             Secure checkout is handled by Stripe. A flat {formatMoney(deliveryFee)} delivery fee is included
             {isRushOrder ? `, plus a ${formatMoney(expediteFee)} expedite fee for orders within 24 hours.` : '.'}
           </p>
+          <p className={styles.disclaimer}>
+            Renters are responsible for replacing any products that are damaged or broken during their rental.
+          </p>
           {error && <p className={styles.error}>{error}</p>}
           <button type="button" className="btn btnPrimary" onClick={onPayNow} disabled={isSubmitting}>
             {isSubmitting ? 'Redirecting...' : 'Pay Now'}
