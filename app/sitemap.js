@@ -1,6 +1,8 @@
 import { getAllIndexablePaths } from '@/lib/seo-content';
 import { absoluteUrl } from '@/lib/site';
 
+export const dynamic = 'force-static';
+
 export default function sitemap() {
   const now = new Date();
 

@@ -1,6 +1,5 @@
 import './globals.css';
 import Script from 'next/script';
-import { headers } from 'next/headers';
 import Providers from '@/app/providers';
 import { Analytics } from '@vercel/analytics/next';
 import CartBubble from '@/components/CartBubble';
@@ -27,9 +26,8 @@ export const metadata = {
   }
 };
 
-export default async function RootLayout({ children }) {
-  const pathname = (await headers()).get('x-pathname') || '';
-  const shouldIncludeGoogleTag = pathname !== '/vending' && !pathname.startsWith('/Vending');
+export default function RootLayout({ children }) {
+  const shouldIncludeGoogleTag = true;
   const appBackgroundImage = `url('${withBasePath('/rentals/visual/BACKGROUND.png')}')`;
 
   return (
