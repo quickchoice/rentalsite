@@ -11,7 +11,8 @@ const navLinks = [
   { href: '/rentals/beach-gear', label: 'Beach Gear' },
   { href: '/locations/myrtle-beach-sc', label: 'Myrtle Beach' },
   { href: '/locations/charleston-sc', label: 'Charleston' },
-  { href: '/rentals', label: 'All Rentals' }
+  { href: '/rentals', label: 'All Rentals' },
+  { href: '/checkout', label: 'Book Now', highlight: true }
 ];
 
 const trustItems = [
@@ -69,7 +70,11 @@ export default function HomePageClient() {
 
         <nav className={styles.navLinks} aria-label="Main navigation">
           {navLinks.map(link => (
-            <Link key={link.label} href={link.href} className={styles.navLink}>
+            <Link
+              key={link.label}
+              href={link.href}
+              className={link.highlight ? styles.navLinkBookNow : styles.navLink}
+            >
               {link.label}
             </Link>
           ))}

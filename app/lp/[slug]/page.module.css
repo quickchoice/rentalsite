@@ -1,0 +1,353 @@
+.page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: #f8f6f1;
+}
+
+/* ── Header (logo + contact only, no nav) ─────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.5rem;
+  background: rgba(255, 252, 245, 0.97);
+  border-bottom: 1px solid #d8c7a6;
+  box-shadow: 0 2px 8px rgba(33, 74, 109, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logoWrap {
+  display: inline-flex;
+  align-items: center;
+}
+
+.logo {
+  width: auto;
+  height: 2.2rem;
+}
+
+.contactLink {
+  color: #133d66;
+  font-weight: 800;
+  font-size: 1rem;
+  border: 1px solid rgba(19, 61, 102, 0.3);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  background: rgba(31, 91, 150, 0.06);
+  transition: background 0.15s ease;
+}
+
+.contactLink:hover {
+  background: rgba(31, 91, 150, 0.12);
+}
+
+/* ── Main ─────────────────────────────────────── */
+.main {
+  width: min(100%, 72rem);
+  margin: 0 auto;
+  padding: 0 1rem 4rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* ── Hero ─────────────────────────────────────── */
+.hero {
+  padding: 3rem 0 1rem;
+}
+
+.heroInner {
+  max-width: 52rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.locationLabel {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #e66e27;
+}
+
+.headline {
+  margin: 0;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  line-height: 1.1;
+  color: #1c2e47;
+  font-weight: 500;
+}
+
+.subhead {
+  margin: 0;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  line-height: 1.5;
+  color: #374456;
+  max-width: 42rem;
+}
+
+.heroCtas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.ctaPrimary,
+.ctaSecondary {
+  min-width: 14rem;
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+}
+
+.trustRow {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+}
+
+.trustRow li {
+  font-size: 0.9rem;
+  color: #374456;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.trustRow li::before {
+  content: '✓';
+  color: #2a8055;
+  font-weight: 800;
+}
+
+/* ── Shared section styles ────────────────────── */
+.section {
+  display: grid;
+  gap: 1rem;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  color: #1f4f7a;
+  font-weight: 500;
+}
+
+/* ── How It Works ─────────────────────────────── */
+.stepsGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  padding: 1.25rem;
+}
+
+.step {
+  display: grid;
+  gap: 0.4rem;
+  padding: 1rem;
+  border: 1px solid rgba(31, 91, 150, 0.14);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.stepNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #133d66, #1f5f91);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.88rem;
+}
+
+.step h3 {
+  margin: 0.2rem 0 0;
+  font-size: 1.05rem;
+  color: #1f4f7a;
+}
+
+.step p {
+  margin: 0;
+  color: #223647;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* ── Highlights grid ──────────────────────────── */
+.highlightGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.highlightCard {
+  padding: 1.1rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.highlightCard h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #1f4f7a;
+}
+
+.highlightCard p {
+  margin: 0;
+  color: #223647;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* ── Mid-page + Final CTA ─────────────────────── */
+.midCta,
+.finalCta {
+  padding: 1.75rem;
+  display: grid;
+  gap: 0.85rem;
+  text-align: center;
+}
+
+.midCta h2,
+.finalCta h2 {
+  margin: 0;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+  color: #1c2e47;
+  font-weight: 500;
+}
+
+.midCta p {
+  margin: 0;
+  color: #374456;
+  line-height: 1.55;
+}
+
+.midCtaButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.contactNote {
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  color: #5a6d7c;
+}
+
+.contactLinkInline {
+  color: #133d66;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+/* ── Testimonials ─────────────────────────────── */
+.testimonialGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+.testimonialCard {
+  padding: 1.25rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.stars {
+  color: #e6a817;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+}
+
+.testimonialCard blockquote {
+  margin: 0;
+}
+
+.testimonialCard blockquote p {
+  margin: 0;
+  font-style: italic;
+  color: #223647;
+  line-height: 1.65;
+}
+
+.testimonialCard footer {
+  font-size: 0.9rem;
+  color: #1f4f7a;
+}
+
+.testimonialCard footer span {
+  color: #5a6d7c;
+}
+
+/* ── Footer ───────────────────────────────────── */
+.footer {
+  margin-top: auto;
+  padding: 1.2rem 1.5rem;
+  border-top: 1px solid #d8c7a6;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.88rem;
+  color: #5a6d7c;
+}
+
+.footer a {
+  color: #1f4f7a;
+  font-weight: 700;
+}
+
+.footer span {
+  opacity: 0.5;
+}
+
+/* ── Responsive ───────────────────────────────── */
+@media (max-width: 640px) {
+  .header {
+    padding: 0.7rem 1rem;
+  }
+
+  .logo {
+    height: 1.8rem;
+  }
+
+  .contactLink {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.7rem;
+  }
+
+  .hero {
+    padding-top: 2rem;
+  }
+
+  .heroCtas {
+    flex-direction: column;
+  }
+
+  .ctaPrimary,
+  .ctaSecondary {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .midCtaButtons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .stepsGrid {
+    padding: 1rem;
+  }
+}

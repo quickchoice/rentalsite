@@ -49,6 +49,9 @@ export default function ContactClientPage() {
           <p className={styles.intro}>
             Use this form for general rental questions, delivery questions, or help deciding what to book for Myrtle Beach or Charleston.
           </p>
+          <p className={styles.intro}>
+            Or call us: <a href="tel:+18437145903">+1 (843) 714-5903</a>
+          </p>
 
           <form
             className={styles.form}

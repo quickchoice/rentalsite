@@ -64,6 +64,19 @@
   line-height: 1.45;
 }
 
+.phoneLink {
+  display: inline-block;
+  margin-top: 0.3rem;
+  color: #1f5b96;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+
+.phoneLink:hover {
+  text-decoration: underline;
+}
+
 .close {
   border: 0;
   background: transparent;

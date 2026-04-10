@@ -1,24 +1,8 @@
-import Link from 'next/link';
-import RentalsShell from '@/components/RentalsShell';
-import styles from '@/app/empty-cart/page.module.css';
+import { redirect } from 'next/navigation';
 
-export const metadata = {
-  robots: {
-    index: false,
-    follow: false
-  }
-};
-
+// Empty cart is no longer a dead-end page.
+// next.config.mjs handles the redirect in server mode.
+// This fallback handles static export mode.
 export default function EmptyCartPage() {
-  return (
-    <RentalsShell>
-      <main>
-        <section className={`${styles.card} card`}>
-          <h1>Your cart is empty</h1>
-          <p>Pick your dates and add rental items to continue.</p>
-          <Link href="/category/baby" className="btn btnPrimary">Return to rental page</Link>
-        </section>
-      </main>
-    </RentalsShell>
-  );
+  redirect('/category/baby');
 }

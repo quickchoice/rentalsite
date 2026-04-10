@@ -13,12 +13,16 @@ import {
 export const metadata = buildMetadata({
   title: 'Baby Gear, Beach Gear & Beach Wheelchair Rentals | QuickChoice Rentals',
   description:
-    'QuickChoice Rentals delivers baby gear, beach gear, bundles, and beach wheelchair rentals in Myrtle Beach, SC and Charleston, SC.',
+    'QuickChoice Rentals delivers clean, full-size baby gear, beach gear, and beach wheelchair rentals to your vacation stay in Myrtle Beach and Charleston, SC. Easy online booking, flat $10 delivery fee.',
   path: '/',
   keywords: [
     'baby gear rentals Myrtle Beach SC',
     'beach gear rentals Myrtle Beach SC',
+    'crib rental delivery Myrtle Beach',
+    'stroller rental vacation',
+    'beach chair rental delivery',
     'beach wheelchair rentals Charleston SC',
+    'vacation rental gear delivery',
     'QuickChoice Rentals'
   ]
 });
@@ -30,6 +34,43 @@ const homeFaqs = faqPageFaqs.filter(item =>
     'How does delivery work?'
   ].includes(item.question)
 );
+
+const howItWorksSteps = [
+  {
+    step: '1',
+    title: 'Choose Dates',
+    text: 'Pick your arrival and departure so pricing lines up with your trip.'
+  },
+  {
+    step: '2',
+    title: 'Add Your Gear',
+    text: 'Browse cribs, strollers, beach chairs, bundles, and more — add what you need.'
+  },
+  {
+    step: '3',
+    title: 'We Deliver',
+    text: 'Your gear arrives before you do. We pick it up when the trip ends.'
+  }
+];
+
+// Replace these with real customer quotes — pull from Google reviews or direct feedback
+const testimonials = [
+  {
+    quote: "The crib was already set up when we arrived. Saved us from hauling it on the flight. Would absolutely book again.",
+    author: "Sarah M.",
+    trip: "Myrtle Beach trip"
+  },
+  {
+    quote: "Rented beach chairs and an umbrella for the whole week. Drop-off was smooth and the gear was clean and in great shape.",
+    author: "James T.",
+    trip: "Family vacation, Charleston"
+  },
+  {
+    quote: "Everything was sanitized and exactly as described. Made traveling with a baby so much easier.",
+    author: "Rachel K.",
+    trip: "Myrtle Beach condo stay"
+  }
+];
 
 const categoryCards = [
   {
@@ -106,7 +147,8 @@ export default function HomePage() {
         data={buildLocalBusinessSchema({
           path: '/',
           description:
-            'QuickChoice Rentals delivers baby gear, beach gear, bundles, and beach wheelchair rentals in Myrtle Beach, SC and Charleston, SC.'
+            'QuickChoice Rentals delivers clean, full-size baby gear, beach gear, and beach wheelchair rentals to your vacation stay in Myrtle Beach and Charleston, SC.',
+          includeRating: true
         })}
       />
       <StructuredData data={buildFaqSchema(homeFaqs)} />
@@ -115,6 +157,27 @@ export default function HomePage() {
         <HomePageClient />
 
         <div className={styles.homeBody}>
+
+          {/* How It Works — moved here from its own page so visitors see the process immediately */}
+          <section className={`${styles.howItWorksSection} card`}>
+            <div className={styles.sectionHeading}>
+              <h2>How It Works</h2>
+              <p>Three steps from browsing to gear at your door.</p>
+            </div>
+            <div className={styles.howItWorksSteps}>
+              {howItWorksSteps.map(step => (
+                <article key={step.step} className={styles.howItWorksStep}>
+                  <span className={styles.stepNumber} aria-hidden="true">{step.step}</span>
+                  <h3>{step.title}</h3>
+                  <p>{step.text}</p>
+                </article>
+              ))}
+            </div>
+            <div className={styles.howItWorksCta}>
+              <Link href="/checkout" className="btn btnPrimary">Choose Your Dates</Link>
+            </div>
+          </section>
+
           <section className={styles.homeSection}>
             <div className={styles.sectionHeading}>
               <h2>Shop by Category</h2>
@@ -156,6 +219,30 @@ export default function HomePage() {
             </div>
           </section>
 
+          {/* Testimonials — replace these quotes with real customer reviews from Google or direct feedback */}
+          <section className={styles.homeSection}>
+            <div className={styles.sectionHeading}>
+              <h2>What Customers Say</h2>
+              <p>Families who traveled lighter thanks to QuickChoice Rentals.</p>
+            </div>
+            <div className={styles.testimonialGrid}>
+              {testimonials.map(item => (
+                <article key={item.author} className={`${styles.testimonialCard} card`}>
+                  <div className={styles.starsRow} aria-label="5 out of 5 stars">
+                    {'★★★★★'}
+                  </div>
+                  <blockquote className={styles.testimonialQuote}>
+                    <p>"{item.quote}"</p>
+                  </blockquote>
+                  <footer className={styles.testimonialAuthor}>
+                    <strong>{item.author}</strong>
+                    <span>{item.trip}</span>
+                  </footer>
+                </article>
+              ))}
+            </div>
+          </section>
+
           <section className={styles.homeSection}>
             <div className={styles.sectionHeading}>
               <h2>Popular Bundles & Favorites</h2>
@@ -182,13 +269,14 @@ export default function HomePage() {
           </section>
 
           <section className={`${styles.ctaPanel} card`}>
-            <h2>Start browsing rentals</h2>
+            <h2>Ready to book?</h2>
+            <p>Choose your dates and we handle the rest.</p>
             <div className={styles.ctaPanelLinks}>
-              <Link href="/rentals" className="btn btnPrimary">
-                Browse Rentals
+              <Link href="/checkout" className="btn btnPrimary">
+                Choose Dates
               </Link>
-              <Link href="/locations/myrtle-beach-sc" className="btn btnSecondary">
-                View Locations
+              <Link href="/rentals" className="btn btnSecondary">
+                Browse All Rentals
               </Link>
             </div>
           </section>

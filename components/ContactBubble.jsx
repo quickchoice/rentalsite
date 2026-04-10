@@ -67,6 +67,7 @@ export default function ContactBubble() {
             <div>
               <h2>Need help?</h2>
               <p>Send us a quick message.</p>
+              <a href="tel:+18437145903" className={styles.phoneLink}>+1 (843) 714-5903</a>
             </div>
             <button
               type="button"

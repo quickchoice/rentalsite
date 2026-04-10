@@ -50,6 +50,24 @@
   opacity: 0.62;
 }
 
+.navLinkBookNow {
+  font-size: 1.15rem;
+  line-height: 1;
+  color: #fff;
+  background: linear-gradient(90deg, #133d66, #1f5f91);
+  border-radius: 999px;
+  padding: 0.38rem 0.9rem;
+  font-weight: 800;
+  box-shadow: 0 4px 10px rgba(17, 35, 57, 0.22);
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.navLinkBookNow:hover,
+.navLinkBookNow:focus-visible {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
 .hero {
   position: relative;
   width: 100%;
@@ -455,6 +473,108 @@
   line-height: 1.65;
 }
 
+/* ── How It Works ─────────────────────────────── */
+.howItWorksSection {
+  padding: 1.5rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.howItWorksSteps {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.howItWorksStep {
+  display: grid;
+  gap: 0.4rem;
+  padding: 1rem;
+  border: 1px solid rgba(31, 91, 150, 0.14);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.6);
+  position: relative;
+}
+
+.stepNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #133d66, #1f5f91);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.howItWorksStep h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #1f4f7a;
+}
+
+.howItWorksStep p {
+  margin: 0;
+  color: #223647;
+  line-height: 1.6;
+}
+
+.howItWorksCta {
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* ── Testimonials ─────────────────────────────── */
+.testimonialGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+.testimonialCard {
+  padding: 1.25rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.starsRow {
+  color: #e6a817;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+}
+
+.testimonialQuote {
+  margin: 0;
+}
+
+.testimonialQuote p {
+  margin: 0;
+  line-height: 1.65;
+  color: #223647;
+  font-style: italic;
+}
+
+.testimonialAuthor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-top: 0.25rem;
+}
+
+.testimonialAuthor strong {
+  color: #1f4f7a;
+  font-size: 0.95rem;
+}
+
+.testimonialAuthor span {
+  color: #5a6d7c;
+  font-size: 0.85rem;
+}
+
+/* ── CTA Panel ────────────────────────────────── */
 .ctaPanel {
   padding: 1.4rem;
   display: grid;
@@ -516,6 +636,11 @@
 
   .navLink {
     font-size: 0.95rem;
+  }
+
+  .navLinkBookNow {
+    font-size: 0.95rem;
+    padding: 0.3rem 0.75rem;
   }
 
   .hero {
