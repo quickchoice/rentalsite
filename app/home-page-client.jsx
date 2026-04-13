@@ -7,8 +7,8 @@ import styles from '@/app/page.module.css';
 import { withBasePath } from '@/lib/paths';
 
 const navLinks = [
-  { href: '/rentals/baby-gear', label: 'Baby Gear' },
-  { href: '/rentals/beach-gear', label: 'Beach Gear' },
+  { href: '/category/baby', label: 'Baby Gear' },
+  { href: '/category/beach', label: 'Beach Gear' },
   { href: '/locations/myrtle-beach-sc', label: 'Myrtle Beach' },
   { href: '/locations/charleston-sc', label: 'Charleston' },
   { href: '/rentals', label: 'All Rentals' },
@@ -108,10 +108,10 @@ export default function HomePageClient() {
         </p>
 
         <div className={styles.ctaRow}>
-          <Link href="/rentals/baby-gear" className={`${styles.cta} ${styles.ctaPrimary}`}>
+          <Link href="/category/baby" className={`${styles.cta} ${styles.ctaPrimary}`}>
             Browse Baby Gear
           </Link>
-          <Link href="/rentals/beach-gear" className={`${styles.cta} ${styles.ctaSecondary}`}>
+          <Link href="/category/beach" className={`${styles.cta} ${styles.ctaSecondary}`}>
             Browse Beach Gear
           </Link>
         </div>

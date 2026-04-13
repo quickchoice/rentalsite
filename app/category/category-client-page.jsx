@@ -1,12 +1,31 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import RentalsShell from '@/components/RentalsShell';
 import styles from '@/app/category/page.module.css';
 import { bundles, categories, categoryIntro, products } from '@/lib/data';
 import { formatMoney, getBundleBasePricePerDay } from '@/lib/cart';
 import { useStore } from '@/context/StoreContext';
+
+const subcategoriesByCategory = {
+  baby: [
+    { id: 'all', label: 'All' },
+    { id: 'sleep', label: 'Sleep', ids: ['baby-cribs', 'baby-bassinet', 'baby-pack-n-play', 'baby-slumberpod'] },
+    { id: 'strollers', label: 'Strollers', ids: ['baby-single-jogging-stroller', 'baby-double-jogging-stroller', 'baby-tandem-double-stroller'] },
+    { id: 'car-seats', label: 'Car Seats', ids: ['baby-car-seat-booster', 'baby-car-seat-infant', 'baby-car-seat-convertible'] },
+    { id: 'feeding', label: 'Feeding', ids: ['baby-high-chair-tray', 'baby-booster-seat-tray'] },
+    { id: 'monitors', label: 'Monitors', ids: ['baby-2-camera-monitor', 'baby-1-camera-monitor'] },
+    { id: 'activity', label: 'Activity', ids: ['baby-bouncy-seat', 'baby-swing', 'baby-exersaucer', 'baby-gates', 'baby-bath-tub', 'baby-noise-machine'] }
+  ],
+  beach: [
+    { id: 'all', label: 'All' },
+    { id: 'chairs-shade', label: 'Chairs & Shade', ids: ['beach-chair', 'beach-chair-umbrella', 'beach-umbrella'] },
+    { id: 'hauling', label: 'Hauling', ids: ['beach-wagon', 'beach-cart'] },
+    { id: 'games', label: 'Games', ids: ['beach-spikeball', 'beach-cornhole'] },
+    { id: 'accessories', label: 'Accessories', ids: ['beach-towel', 'beach-wheelchair'] }
+  ]
+};
 
 const DISCOUNT_PERCENT = 30;
 const seoHubByCategory = {
@@ -57,6 +76,30 @@ export default function CategoryClientPage({ categoryId }) {
   const { addToCart, addBundle } = useStore();
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('featured');
+  const [subcat, setSubcat] = useState('all');
+  const [recentlyAdded, setRecentlyAdded] = useState(null);
+  const [toast, setToast] = useState(null);
+  const toastTimer = useRef(null);
+
+  function triggerFeedback(itemName) {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast(itemName);
+    toastTimer.current = setTimeout(() => setToast(null), 2200);
+  }
+
+  function handleAddToCart(itemId, itemName) {
+    addToCart(itemId, 1);
+    setRecentlyAdded(itemId);
+    setTimeout(() => setRecentlyAdded(id => id === itemId ? null : id), 1500);
+    triggerFeedback(itemName);
+  }
+
+  function handleAddBundle(bundleId, bundleName) {
+    addBundle(bundleId, 1);
+    setRecentlyAdded(`bundle-${bundleId}`);
+    setTimeout(() => setRecentlyAdded(id => id === `bundle-${bundleId}` ? null : id), 1500);
+    triggerFeedback(bundleName);
+  }
 
   const currentCategory = categories.find(category => category.id === categoryId) ?? categories[0];
 
@@ -66,14 +109,23 @@ export default function CategoryClientPage({ categoryId }) {
     return list;
   };
 
+  const activeSubcatIds = useMemo(() => {
+    if (subcat === 'all') return null;
+    const entry = (subcategoriesByCategory[currentCategory.id] || []).find(s => s.id === subcat);
+    return entry?.ids ?? null;
+  }, [subcat, currentCategory.id]);
+
   const filteredProducts = useMemo(() => {
     const term = search.trim().toLowerCase();
     const list = products.filter(
-      item => item.categoryId === currentCategory.id && item.name.toLowerCase().includes(term)
+      item =>
+        item.categoryId === currentCategory.id &&
+        item.name.toLowerCase().includes(term) &&
+        (activeSubcatIds ? activeSubcatIds.includes(item.id) : true)
     );
 
     return sortByPrice(list, sort);
-  }, [currentCategory.id, search, sort]);
+  }, [currentCategory.id, search, sort, activeSubcatIds]);
 
   const featuredBundles = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -84,8 +136,15 @@ export default function CategoryClientPage({ categoryId }) {
     return sortByPrice(list, sort);
   }, [currentCategory.id, search, sort]);
 
+  const subcats = subcategoriesByCategory[currentCategory.id] || [];
+
   return (
     <RentalsShell>
+      {toast && (
+        <div className={styles.toast} role="status" aria-live="polite">
+          <span className={styles.toastCheck}>✓</span> <strong>{toast}</strong> added to cart
+        </div>
+      )}
       <main>
         <section className={styles.hero}>
           <div>
@@ -97,6 +156,7 @@ export default function CategoryClientPage({ categoryId }) {
                 <Link
                   key={category.id}
                   href={`/category/${category.id}`}
+                  onClick={() => setSubcat('all')}
                   className={`${styles.tab} ${category.id === currentCategory.id ? styles.tabActive : ''}`}
                 >
                   {category.name}
@@ -127,6 +187,21 @@ export default function CategoryClientPage({ categoryId }) {
               <span className={styles.selectArrow} aria-hidden="true">⌄</span>
             </div>
           </div>
+
+          {subcats.length > 0 && (
+            <div className={styles.subcatChips} role="group" aria-label="Filter by type">
+              {subcats.map(chip => (
+                <button
+                  key={chip.id}
+                  type="button"
+                  onClick={() => setSubcat(chip.id)}
+                  className={`${styles.subcatChip} ${subcat === chip.id ? styles.subcatChipActive : ''}`}
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
+          )}
         </section>
 
         <section>
@@ -150,7 +225,13 @@ export default function CategoryClientPage({ categoryId }) {
                     <span className={styles.newPrice}>{formatMoney(bundleDiscountedPrice)}/day</span>
                   </p>
                   <div className={styles.actions}>
-                    <button type="button" className="btn btnPrimary" onClick={() => addBundle(bundle.id, 1)}>Add bundle</button>
+                    <button
+                      type="button"
+                      className={`btn ${recentlyAdded === `bundle-${bundle.id}` ? styles.addedBtn : 'btnPrimary'}`}
+                      onClick={() => handleAddBundle(bundle.id, bundle.name)}
+                    >
+                      {recentlyAdded === `bundle-${bundle.id}` ? '✓ Added!' : 'Add bundle'}
+                    </button>
                     <Link href={`/bundle/${bundle.id}`} className="btn btnSecondary">View details</Link>
                   </div>
                 </article>
@@ -182,7 +263,13 @@ export default function CategoryClientPage({ categoryId }) {
                     <span className={styles.newPrice}>{formatMoney(item.pricePerDay)}/day</span>
                   </p>
                   <div className={styles.actions}>
-                    <button type="button" className="btn btnPrimary" onClick={() => addToCart(item.id, 1)}>Quick add</button>
+                    <button
+                      type="button"
+                      className={`btn ${recentlyAdded === item.id ? styles.addedBtn : 'btnPrimary'}`}
+                      onClick={() => handleAddToCart(item.id, item.name)}
+                    >
+                      {recentlyAdded === item.id ? '✓ Added!' : 'Quick add'}
+                    </button>
                     <Link href={`/product/${item.id}`} className="btn btnSecondary">View details</Link>
                   </div>
                 </article>

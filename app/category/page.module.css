@@ -266,3 +266,81 @@
   font-size: clamp(0.68rem, 1.5vw, 0.88rem);
   padding-inline: 0.5rem;
 }
+
+/* Subcategory filter chips */
+.subcatChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.subcatChip {
+  border: 1.5px solid #b5d4ec;
+  border-radius: 999px;
+  background: #f0f8ff;
+  color: #1f4f7a;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.32rem 0.78rem;
+  cursor: pointer;
+  transition: background 0.13s, border-color 0.13s, color 0.13s, transform 0.1s;
+}
+
+.subcatChip:hover {
+  background: #daeef9;
+  border-color: #2f6d9f;
+  transform: translateY(-1px);
+}
+
+.subcatChipActive {
+  background: linear-gradient(180deg, #2e6ea2, #1d537f);
+  border-color: #123c63;
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(18, 60, 99, 0.28);
+}
+
+/* Add-to-cart button confirmed state */
+.addedBtn {
+  background: linear-gradient(180deg, #1a7a3c, #125a2b) !important;
+  border-color: #0d4420 !important;
+  color: #fff !important;
+  cursor: default;
+  animation: addedPop 200ms cubic-bezier(0.22, 1.35, 0.36, 1);
+}
+
+@keyframes addedPop {
+  0% { transform: scale(0.92); }
+  60% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* Toast notification */
+.toast {
+  position: fixed;
+  bottom: 5.5rem;
+  right: 1rem;
+  z-index: 200;
+  background: #1a3a52;
+  color: #fff;
+  border-radius: 0.75rem;
+  padding: 0.7rem 1.1rem;
+  font-size: 0.92rem;
+  box-shadow: 0 8px 24px rgba(12, 36, 56, 0.38);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  animation: toastSlideIn 240ms cubic-bezier(0.22, 1.1, 0.36, 1);
+  pointer-events: none;
+}
+
+.toastCheck {
+  font-size: 1rem;
+  color: #5de88a;
+  font-weight: 900;
+}
+
+@keyframes toastSlideIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
