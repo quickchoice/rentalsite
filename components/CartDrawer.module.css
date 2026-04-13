@@ -176,6 +176,18 @@
   align-items: center;
 }
 
+.promoRow {
+  background: #f0fbf4;
+  border: 1px solid #a4d9b5;
+  border-radius: 0.5rem;
+  padding: 0.3rem 0.55rem;
+  font-size: 0.9rem;
+}
+
+.promoAmount {
+  color: #0f4d21;
+}
+
 .checkout {
   border-radius: 999px;
   background: linear-gradient(180deg, #ff9e47, #ea6b28);

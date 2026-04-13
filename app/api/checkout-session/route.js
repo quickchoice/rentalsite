@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { DEFAULT_DELIVERY_FEE_CENTS, DEFAULT_EXPEDITE_FEE_CENTS, getDayCount, isExpeditedOrder, parseDateLocal } from '@/lib/cart';
+import { DEFAULT_DELIVERY_FEE_CENTS, DEFAULT_EXPEDITE_FEE_CENTS, getDayCount, getPromoDiscount, isExpeditedOrder, parseDateLocal } from '@/lib/cart';
 import { bundles, products } from '@/lib/data';
 
 const productById = new Map(products.map(product => [product.id, product]));
@@ -69,14 +69,18 @@ function sanitizeCart(cart) {
   return [...normalizedProducts, ...normalizedBundles];
 }
 
-function buildStripeCheckoutParams({ lineItems, orderMeta, customerInfo, dayCount, origin, promoApplied, expediteFeeCents }) {
+function buildStripeCheckoutParams({ lineItems, orderMeta, customerInfo, dayCount, origin, promoApplied, expediteFeeCents, promoCouponId }) {
   const params = new URLSearchParams();
 
   params.set('mode', 'payment');
   params.set('customer_creation', 'always');
   params.set('success_url', `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`);
   params.set('cancel_url', `${origin}/summary?canceled=1`);
-  params.set('allow_promotion_codes', 'true');
+  if (promoCouponId) {
+    params.set('discounts[0][coupon]', promoCouponId);
+  } else {
+    params.set('allow_promotion_codes', 'true');
+  }
   params.set('metadata[start_date]', orderMeta.startDate);
   params.set('metadata[end_date]', orderMeta.endDate);
   params.set('metadata[location]', orderMeta.location);
@@ -99,6 +103,9 @@ function buildStripeCheckoutParams({ lineItems, orderMeta, customerInfo, dayCoun
   params.set('metadata[promo_applied]', promoApplied ? 'true' : 'false');
   if (promoApplied) {
     params.set('metadata[promo_discount_percent]', String(DISCOUNT_PERCENT));
+  }
+  if (promoCouponId) {
+    params.set('metadata[sun_soaked_savings_coupon]', promoCouponId);
   }
 
   lineItems.forEach((lineItem, index) => {
@@ -273,6 +280,34 @@ export async function POST(request) {
     );
   }
 
+  // Sun-Soaked Savings: automatic tiered discount based on rental subtotal
+  const rentalSubtotalCents = lineItems.reduce((sum, item) => sum + item.unitAmountCents * item.qty, 0);
+  const promoDiscountDollars = getPromoDiscount(rentalSubtotalCents / 100);
+  let promoCouponId = null;
+  if (promoDiscountDollars > 0) {
+    try {
+      const couponParams = new URLSearchParams();
+      couponParams.set('amount_off', String(promoDiscountDollars * 100));
+      couponParams.set('currency', 'usd');
+      couponParams.set('duration', 'once');
+      const couponRes = await fetch('https://api.stripe.com/v1/coupons', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${secretKey}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: couponParams.toString(),
+        cache: 'no-store'
+      });
+      if (couponRes.ok) {
+        const couponJson = await couponRes.json();
+        promoCouponId = couponJson.id || null;
+      }
+    } catch {
+      // If coupon creation fails, proceed without the discount rather than blocking checkout
+    }
+  }
+
   const origin = request.headers.get('origin') || request.nextUrl.origin;
   const params = buildStripeCheckoutParams({
     lineItems,
@@ -281,7 +316,8 @@ export async function POST(request) {
     dayCount,
     origin,
     promoApplied,
-    expediteFeeCents
+    expediteFeeCents,
+    promoCouponId
   });
 
   let stripeResponse;

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import RentalsShell from '@/components/RentalsShell';
 import styles from '@/app/summary/page.module.css';
 import { useStore } from '@/context/StoreContext';
-import { formatMoney, getBundleBasePricePerDay, getBundleById, getDayCount, getDeliveryFee, getExpediteFee, getProductById, isExpeditedOrder } from '@/lib/cart';
+import { formatMoney, getBundleBasePricePerDay, getBundleById, getDayCount, getDeliveryFee, getExpediteFee, getProductById, getPromoDiscount, isExpeditedOrder } from '@/lib/cart';
 import { locations } from '@/lib/data';
 import { withBasePath } from '@/lib/paths';
 
@@ -28,7 +28,8 @@ export default function SummaryPage() {
   const days = getDayCount(orderMeta);
   const deliveryFee = getDeliveryFee(cart);
   const expediteFee = getExpediteFee(orderMeta);
-  const totalWithFees = subtotal + deliveryFee + expediteFee;
+  const promoDiscount = getPromoDiscount(subtotal);
+  const totalWithFees = subtotal + deliveryFee + expediteFee - promoDiscount;
   const isRushOrder = isExpeditedOrder(orderMeta);
   const locationName = locations.find(location => location.id === orderMeta.location)?.name || 'Not selected';
   const deliveryAreas = [
@@ -170,6 +171,12 @@ export default function SummaryPage() {
           <div className={styles.subtotal}><span>Flat delivery fee</span><strong>{formatMoney(deliveryFee)}</strong></div>
           {isRushOrder && (
             <div className={styles.subtotal}><span>Expedite fee</span><strong>{formatMoney(expediteFee)}</strong></div>
+          )}
+          {promoDiscount > 0 && (
+            <div className={`${styles.subtotal} ${styles.promoRow}`}>
+              <span>Sun-Soaked Savings discount</span>
+              <strong className={styles.promoAmount}>-{formatMoney(promoDiscount)}</strong>
+            </div>
           )}
           <div className={styles.subtotal}><span>Total</span><strong>{formatMoney(totalWithFees)}</strong></div>
           <div className={styles.contactBlock}>
