@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import styles from '@/components/CartDrawer.module.css';
 import { useStore } from '@/context/StoreContext';
-import { formatMoney, getBundleBasePricePerDay, getBundleById, getDayCount, getDeliveryFee, getExpediteFee, getProductById, getPromoDiscount, isExpeditedOrder } from '@/lib/cart';
+import { formatMoney, getBundleBasePricePerDay, getBundleById, getBundleTier, getDayCount, getDeliveryFee, getExpediteFee, getProductById, getPromoDiscount, isExpeditedOrder } from '@/lib/cart';
 import { locations } from '@/lib/data';
 
 export default function CartDrawer() {
@@ -42,7 +42,9 @@ export default function CartDrawer() {
   const deliveryFee = getDeliveryFee(cart);
   const expediteFee = getExpediteFee(orderMeta);
   const promoDiscount = getPromoDiscount(subtotal);
-  const totalWithFees = subtotal + deliveryFee + expediteFee - promoDiscount;
+  const bundleTier = getBundleTier(cart);
+  const bundleDiscount = bundleTier ? Math.round(subtotal * bundleTier.discountPercent) / 100 : 0;
+  const totalWithFees = subtotal + deliveryFee + expediteFee - promoDiscount - bundleDiscount;
   const isRushOrder = isExpeditedOrder(orderMeta);
 
   function onStartDateChange(value) {
@@ -171,6 +173,12 @@ export default function CartDrawer() {
           <div className={styles.subtotal}><span>Flat delivery fee</span><strong>{formatMoney(deliveryFee)}</strong></div>
           {isRushOrder && (
             <div className={styles.subtotal}><span>Expedite fee</span><strong>{formatMoney(expediteFee)}</strong></div>
+          )}
+          {bundleDiscount > 0 && (
+            <div className={`${styles.subtotal} ${styles.bundleRow}`}>
+              <span>Bundle savings ({bundleTier.discountPercent}% off)</span>
+              <strong className={styles.bundleAmount}>-{formatMoney(bundleDiscount)}</strong>
+            </div>
           )}
           {promoDiscount > 0 && (
             <div className={`${styles.subtotal} ${styles.promoRow}`}>

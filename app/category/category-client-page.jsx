@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { useMemo, useRef, useState } from 'react';
 import RentalsShell from '@/components/RentalsShell';
+import BundleBuilder from '@/components/BundleBuilder';
 import styles from '@/app/category/page.module.css';
-import { bundles, categories, categoryIntro, products } from '@/lib/data';
-import { formatMoney, getBundleBasePricePerDay } from '@/lib/cart';
+import { categories, categoryIntro, products } from '@/lib/data';
+import { formatMoney } from '@/lib/cart';
 import { useStore } from '@/context/StoreContext';
 
 const subcategoriesByCategory = {
@@ -73,7 +74,7 @@ function getOriginalPrice(finalPrice) {
 }
 
 export default function CategoryClientPage({ categoryId }) {
-  const { addToCart, addBundle } = useStore();
+  const { addToCart } = useStore();
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('featured');
   const [subcat, setSubcat] = useState('all');
@@ -92,13 +93,6 @@ export default function CategoryClientPage({ categoryId }) {
     setRecentlyAdded(itemId);
     setTimeout(() => setRecentlyAdded(id => id === itemId ? null : id), 1500);
     triggerFeedback(itemName);
-  }
-
-  function handleAddBundle(bundleId, bundleName) {
-    addBundle(bundleId, 1);
-    setRecentlyAdded(`bundle-${bundleId}`);
-    setTimeout(() => setRecentlyAdded(id => id === `bundle-${bundleId}` ? null : id), 1500);
-    triggerFeedback(bundleName);
   }
 
   const currentCategory = categories.find(category => category.id === categoryId) ?? categories[0];
@@ -126,15 +120,6 @@ export default function CategoryClientPage({ categoryId }) {
 
     return sortByPrice(list, sort);
   }, [currentCategory.id, search, sort, activeSubcatIds]);
-
-  const featuredBundles = useMemo(() => {
-    const term = search.trim().toLowerCase();
-    const list = bundles.filter(
-      bundle => bundle.categoryId === currentCategory.id && bundle.name.toLowerCase().includes(term)
-    );
-
-    return sortByPrice(list, sort);
-  }, [currentCategory.id, search, sort]);
 
   const subcats = subcategoriesByCategory[currentCategory.id] || [];
 
@@ -205,39 +190,7 @@ export default function CategoryClientPage({ categoryId }) {
         </section>
 
         <section>
-          <div className={styles.sectionHeader}><h2>Featured bundles</h2><p className="muted">Best value, fewer decisions.</p></div>
-          <div className={styles.grid}>
-            {featuredBundles.map(bundle => {
-              const bundleDiscountPercent = bundle.discountPercent || 10;
-              const bundleBasePrice = getBundleBasePricePerDay(bundle);
-              const bundleDiscountedPrice = bundle.pricePerDay;
-
-              return (
-                <article key={bundle.id} className={`${styles.itemCard} card`}>
-                  <div className={styles.imageWrap}>
-                    <div className={`${styles.image} ${styles.bundleImage}`} style={{ backgroundImage: `url(${bundle.imageUrl})` }} />
-                    <span className={styles.bundleTag}>BUNDLE SAVE {bundleDiscountPercent}%</span>
-                  </div>
-                  <strong>{bundle.name}</strong>
-                  <p className="muted">{bundle.description}</p>
-                  <p className={styles.priceLine}>
-                    <span className={styles.oldPrice}>{formatMoney(bundleBasePrice)}/day</span>
-                    <span className={styles.newPrice}>{formatMoney(bundleDiscountedPrice)}/day</span>
-                  </p>
-                  <div className={styles.actions}>
-                    <button
-                      type="button"
-                      className={`btn ${recentlyAdded === `bundle-${bundle.id}` ? styles.addedBtn : 'btnPrimary'}`}
-                      onClick={() => handleAddBundle(bundle.id, bundle.name)}
-                    >
-                      {recentlyAdded === `bundle-${bundle.id}` ? '✓ Added!' : 'Add bundle'}
-                    </button>
-                    <Link href={`/bundle/${bundle.id}`} className="btn btnSecondary">View details</Link>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+          <BundleBuilder />
         </section>
 
         <section>
