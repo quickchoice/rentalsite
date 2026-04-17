@@ -6,6 +6,13 @@ import { getBundleTier } from '@/lib/cart';
 import styles from './BundleBuilder.module.css';
 
 const MAX = 7;
+const BUNDLE_EXCLUDED_IDS = new Set([
+  'baby-bath-tub',
+  'baby-noise-machine',
+  'baby-booster-seat-tray',
+  'beach-towel',
+  'beach-spikeball'
+]);
 const MILESTONES = [
   { items: 3, label: '10% off', reward: '10% off your order', pct: (3 / MAX) * 100 },
   { items: 5, label: '15% off', reward: '15% off your order', pct: (5 / MAX) * 100 },
@@ -18,7 +25,7 @@ export default function BundleBuilder() {
   const [justUnlocked, setJustUnlocked] = useState(null);
   const prevRef = useRef(0);
 
-  const lineCount = cart.filter(l => l.type === 'product').length;
+  const lineCount = cart.filter(l => l.type === 'product' && !BUNDLE_EXCLUDED_IDS.has(l.productId)).length;
   const fillPct = Math.min((lineCount / MAX) * 100, 100);
   const tier = getBundleTier(cart);
 
@@ -42,7 +49,7 @@ export default function BundleBuilder() {
       <div className={styles.teaser}>
         <div className={styles.teaserLeft}>
           <h2 className={styles.teaserTitle}>Build Your Bundle & Save</h2>
-          <p className={styles.teaserSub}>Mix and match items — the more you add, the more you unlock.</p>
+          <p className={styles.teaserSub}>Mix and match items — the more you add, the more you unlock. <em>Select items only.</em></p>
           <ul className={styles.teaserList}>
             {MILESTONES.map(m => (
               <li key={m.items} className={styles.teaserItem}>
@@ -68,7 +75,7 @@ export default function BundleBuilder() {
   return (
     <div className={`${styles.builder} ${justUnlocked ? styles.celebrating : ''}`}>
       <div className={styles.builderHeader}>
-        <span className={styles.builderTitle}>Bundle Builder</span>
+        <span className={styles.builderTitle}>Bundle Builder <span className={styles.selectOnly}>— Select Items Only</span></span>
         {tier && (
           <span className={styles.tierBadge} key={tier.minLines}>
             {tier.freeDelivery ? '15% off + Free delivery' : `${tier.discountPercent}% off unlocked!`}

@@ -138,6 +138,14 @@
   text-transform: uppercase;
 }
 
+.selectOnly {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #4b7a5e;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
 .tierBadge {
   border-radius: 999px;
   background: linear-gradient(135deg, #059669, #047857);
