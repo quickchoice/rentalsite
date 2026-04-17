@@ -8,11 +8,59 @@ import { formatMoney, getBundleBasePricePerDay, getBundleById, getDayCount, getD
 import { locations } from '@/lib/data';
 import { withBasePath } from '@/lib/paths';
 
+function TermsModal({ onClose }) {
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
+          <h2>QuickChoice Rentals — Terms of Service</h2>
+          <button className={styles.modalClose} onClick={onClose} aria-label="Close">✕</button>
+        </div>
+        <div className={styles.modalBody}>
+          <p className={styles.tosDate}>Last updated: April 2025</p>
+
+          <h3>1. Rental Agreement</h3>
+          <p>By placing an order with QuickChoice Rentals ("Company"), you ("Renter") agree to the terms set forth in this agreement. This agreement is entered into at the time of payment and covers all items included in your rental order.</p>
+
+          <h3>2. Equipment Use</h3>
+          <p>All rental equipment must be used in a manner consistent with its intended purpose and kept within the agreed delivery address. Equipment may not be transferred, sublet, or loaned to third parties.</p>
+
+          <h3>3. Damage &amp; Loss Liability</h3>
+          <p>The Renter is <strong>financially responsible</strong> for any damage, loss, theft, or destruction of rental equipment during the rental period. The Company will assess the cost of repair or full replacement value for any damaged or lost items. The assessed amount will be communicated to the Renter via the email address provided at checkout. By accepting these terms, you agree to pay all assessed damage or replacement costs promptly upon notification.</p>
+
+          <h3>4. Delivery &amp; Pickup</h3>
+          <p>Equipment will be delivered to and picked up from the address provided at checkout on the dates selected. The Renter is responsible for ensuring that all equipment is accessible and available at the agreed pickup time. Failure to make equipment available for scheduled pickup may result in additional fees.</p>
+
+          <h3>5. Cleanliness</h3>
+          <p>All rental equipment is delivered clean and sanitized. Equipment returned in an excessively soiled or unsanitary condition may be subject to a cleaning fee at the Company's discretion.</p>
+
+          <h3>6. Cancellations &amp; Refunds</h3>
+          <p>Cancellation requests and refund eligibility are handled on a case-by-case basis. Please contact us as soon as possible if you need to modify or cancel your order. Refunds for cancellations made less than 24 hours before the delivery date may not be issued.</p>
+
+          <h3>7. Indemnification</h3>
+          <p>The Renter agrees to hold QuickChoice Rentals, its owners, employees, and agents harmless from any and all claims, damages, losses, or injuries arising from the use of rental equipment during the rental period.</p>
+
+          <h3>8. Governing Law</h3>
+          <p>This agreement is governed by the laws of the State of South Carolina. Any disputes arising under this agreement shall be subject to the exclusive jurisdiction of the courts of South Carolina.</p>
+
+          <h3>9. Acceptance</h3>
+          <p>By checking the acceptance box at checkout, you confirm that you have read, understood, and agree to these Terms of Service. Your acceptance is recorded with a timestamp and IP address for the protection of both parties.</p>
+        </div>
+        <div className={styles.modalFooter}>
+          <button className="btn btnPrimary" onClick={onClose}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function SummaryPage() {
   const { cart, orderMeta, subtotal } = useStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [wasCanceled, setWasCanceled] = useState(false);
+  const [tosAccepted, setTosAccepted] = useState(false);
+  const [tosModalOpen, setTosModalOpen] = useState(false);
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
     email: '',
@@ -74,6 +122,10 @@ export default function SummaryPage() {
       setError('Please complete all required contact, delivery address, and city fields.');
       return;
     }
+    if (!tosAccepted) {
+      setError('Please read and accept the Terms of Service before continuing.');
+      return;
+    }
 
     setError('');
     setIsSubmitting(true);
@@ -82,7 +134,7 @@ export default function SummaryPage() {
       const response = await fetch(withBasePath('/api/checkout-session'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cart, orderMeta, customerInfo })
+        body: JSON.stringify({ cart, orderMeta, customerInfo, tosAcceptedAt: new Date().toISOString() })
       });
       const contentType = response.headers.get('content-type') || '';
       let data = null;
@@ -280,15 +332,31 @@ export default function SummaryPage() {
             Secure checkout is handled by Stripe. A flat {formatMoney(deliveryFee)} delivery fee is included
             {isRushOrder ? `, plus a ${formatMoney(expediteFee)} expedite fee for orders within 24 hours.` : '.'}
           </p>
-          <p className={styles.disclaimer}>
-            Renters are responsible for replacing any products that are damaged or broken during their rental.
-          </p>
+          <div className={styles.tosBox}>
+            <p className={styles.tosBoxTitle}>⚠ Required before checkout</p>
+            <label className={styles.tosCheckboxRow}>
+              <input
+                type="checkbox"
+                className={styles.tosCheckbox}
+                checked={tosAccepted}
+                onChange={e => setTosAccepted(e.target.checked)}
+              />
+              <span>
+                I have read and agree to the QuickChoice Rentals{' '}
+                <button type="button" className={styles.tosLink} onClick={() => setTosModalOpen(true)}>
+                  Terms of Service
+                </button>
+                . I understand I am financially responsible for any damage or loss during my rental period.
+              </span>
+            </label>
+          </div>
           {error && <p className={styles.error}>{error}</p>}
-          <button type="button" className="btn btnPrimary" onClick={onPayNow} disabled={isSubmitting}>
+          <button type="button" className="btn btnPrimary" onClick={onPayNow} disabled={isSubmitting || !tosAccepted}>
             {isSubmitting ? 'Redirecting...' : 'Pay Now'}
           </button>
         </section>
       </main>
+      {tosModalOpen && <TermsModal onClose={() => setTosModalOpen(false)} />}
     </RentalsShell>
   );
 }

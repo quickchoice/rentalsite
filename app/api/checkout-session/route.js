@@ -69,7 +69,7 @@ function sanitizeCart(cart) {
   return [...normalizedProducts, ...normalizedBundles];
 }
 
-function buildStripeCheckoutParams({ lineItems, orderMeta, customerInfo, dayCount, origin, promoApplied, expediteFeeCents, promoCouponId }) {
+function buildStripeCheckoutParams({ lineItems, orderMeta, customerInfo, dayCount, origin, promoApplied, expediteFeeCents, promoCouponId, tosAcceptedAt, tosAcceptedIp }) {
   const params = new URLSearchParams();
 
   params.set('mode', 'payment');
@@ -99,6 +99,12 @@ function buildStripeCheckoutParams({ lineItems, orderMeta, customerInfo, dayCoun
   params.set('metadata[customer_message]', metaValue(customerInfo.message));
   if (customerInfo.email) {
     params.set('customer_email', customerInfo.email);
+  }
+  if (tosAcceptedAt) {
+    params.set('metadata[tos_accepted_at]', metaValue(tosAcceptedAt));
+  }
+  if (tosAcceptedIp) {
+    params.set('metadata[tos_accepted_ip]', metaValue(tosAcceptedIp, 64));
   }
   params.set('metadata[promo_applied]', promoApplied ? 'true' : 'false');
   if (promoApplied) {
@@ -167,6 +173,9 @@ export async function POST(request) {
   }
 
   const orderMeta = payload?.orderMeta || {};
+  const tosAcceptedAt = typeof payload?.tosAcceptedAt === 'string' ? payload.tosAcceptedAt.trim() : '';
+  const rawIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '';
+  const tosAcceptedIp = rawIp.split(',')[0].trim();
   const customerInfoPayload = payload?.customerInfo || {};
   const customerInfo = {
     name: typeof customerInfoPayload.name === 'string' ? customerInfoPayload.name.trim() : '',
@@ -317,7 +326,9 @@ export async function POST(request) {
     origin,
     promoApplied,
     expediteFeeCents,
-    promoCouponId
+    promoCouponId,
+    tosAcceptedAt,
+    tosAcceptedIp
   });
 
   let stripeResponse;
