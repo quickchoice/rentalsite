@@ -135,7 +135,7 @@
 .image {
   height: 9rem;
   border-radius: var(--radius);
-  background: #fff center / contain no-repeat;
+  background: #fff center / cover no-repeat;
   border: 1px solid #dbc59d;
 }
 
