@@ -21,7 +21,7 @@ const subcategoriesByCategory = {
   ],
   beach: [
     { id: 'all', label: 'All' },
-    { id: 'chairs-shade', label: 'Chairs & Shade', ids: ['beach-chair', 'beach-chair-umbrella', 'beach-lounge-chair', 'beach-umbrella', 'beach-tent'] },
+    { id: 'chairs-shade', label: 'Chairs & Shade', ids: ['beach-chair', 'beach-chair-umbrella', 'beach-umbrella', 'beach-tent'] },
     { id: 'hauling', label: 'Hauling', ids: ['beach-wagon', 'beach-cart'] },
     { id: 'games', label: 'Games', ids: ['beach-spikeball', 'beach-cornhole'] },
     { id: 'accessories', label: 'Accessories', ids: ['beach-towel', 'beach-wheelchair'] }
