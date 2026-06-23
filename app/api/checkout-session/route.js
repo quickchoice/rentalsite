@@ -134,10 +134,10 @@ function buildStripeCheckoutParams({ lineItems, orderMeta, customerInfo, dayCoun
     params.set(`line_items[${deliveryIndex}][quantity]`, '1');
     params.set(`line_items[${deliveryIndex}][price_data][currency]`, 'usd');
     params.set(`line_items[${deliveryIndex}][price_data][unit_amount]`, String(DELIVERY_FEE_CENTS));
-    params.set(`line_items[${deliveryIndex}][price_data][product_data][name]`, 'Delivery fee');
+    params.set(`line_items[${deliveryIndex}][price_data][product_data][name]`, 'Delivery / Pickup fee');
     params.set(
       `line_items[${deliveryIndex}][price_data][product_data][description]`,
-      'Flat delivery fee (not charged per rental day)'
+      'Flat delivery / pickup fee (not charged per rental day)'
     );
   }
 

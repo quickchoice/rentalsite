@@ -170,7 +170,7 @@ export default function CartDrawer() {
         <div className={styles.footer}>
           <div className={styles.subtotal}><span>Per-day subtotal</span><strong>{formatMoney(dailySubtotal)}</strong></div>
           <div className={styles.subtotal}><span>Trip subtotal</span><strong>{formatMoney(subtotal)}</strong></div>
-          <div className={styles.subtotal}><span>Flat delivery fee</span><strong>{formatMoney(deliveryFee)}</strong></div>
+          <div className={styles.subtotal}><span>Flat delivery / pickup fee</span><strong>{formatMoney(deliveryFee)}</strong></div>
           {isRushOrder && (
             <div className={styles.subtotal}><span>Expedite fee</span><strong>{formatMoney(expediteFee)}</strong></div>
           )}

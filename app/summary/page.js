@@ -220,7 +220,7 @@ export default function SummaryPage() {
           </div>
 
           <div className={styles.subtotal}><span>Rental subtotal</span><strong>{formatMoney(subtotal)}</strong></div>
-          <div className={styles.subtotal}><span>Flat delivery fee</span><strong>{formatMoney(deliveryFee)}</strong></div>
+          <div className={styles.subtotal}><span>Flat delivery / pickup fee</span><strong>{formatMoney(deliveryFee)}</strong></div>
           {isRushOrder && (
             <div className={styles.subtotal}><span>Expedite fee</span><strong>{formatMoney(expediteFee)}</strong></div>
           )}
@@ -329,7 +329,7 @@ export default function SummaryPage() {
             </div>
           </div>
           <p className="muted">
-            Secure checkout is handled by Stripe. A flat {formatMoney(deliveryFee)} delivery fee is included
+            Secure checkout is handled by Stripe. A flat {formatMoney(deliveryFee)} delivery / pickup fee is included
             {isRushOrder ? `, plus a ${formatMoney(expediteFee)} expedite fee for orders within 24 hours.` : '.'}
           </p>
           <div className={styles.tosBox}>

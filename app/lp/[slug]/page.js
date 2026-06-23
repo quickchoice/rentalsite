@@ -103,7 +103,7 @@ export default async function LpPage({ params }) {
               </div>
               <ul className={styles.trustRow}>
                 <li>Sanitized & inspected</li>
-                <li>Flat $10 delivery fee</li>
+                <li>Flat $20 delivery / pickup fee</li>
                 <li>Pickup included</li>
                 <li>Text support</li>
               </ul>

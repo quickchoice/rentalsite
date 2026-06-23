@@ -13,7 +13,7 @@ import {
 export const metadata = buildMetadata({
   title: 'Baby Gear, Beach Gear & Beach Wheelchair Rentals | QuickChoice Rentals',
   description:
-    'QuickChoice Rentals delivers clean, full-size baby gear, beach gear, and beach wheelchair rentals to your vacation stay in Myrtle Beach and Charleston, SC. Easy online booking, flat $10 delivery fee.',
+    'QuickChoice Rentals delivers clean, full-size baby gear, beach gear, and beach wheelchair rentals to your vacation stay in Myrtle Beach and Charleston, SC. Easy online booking, flat $20 delivery / pickup fee.',
   path: '/',
   keywords: [
     'baby gear rentals Myrtle Beach SC',
