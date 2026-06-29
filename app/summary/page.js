@@ -322,6 +322,7 @@ export default function SummaryPage() {
                 Your Message
                 <textarea
                   rows={4}
+                  placeholder="Preferred pickup/drop-off times, access details, or anything else we should know. We'll follow up to confirm "
                   value={customerInfo.message}
                   onChange={event => setCustomerInfo(prev => ({ ...prev, message: event.target.value }))}
                 />
