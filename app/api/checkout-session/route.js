@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { DEFAULT_DELIVERY_FEE_CENTS, DEFAULT_EXPEDITE_FEE_CENTS, getDayCount, getPromoDiscount, isExpeditedOrder, parseDateLocal } from '@/lib/cart';
+import { DEFAULT_DELIVERY_FEE_CENTS, DEFAULT_EXPEDITE_FEE_CENTS, getDayCount, getPromoDiscount, getTaxAmount, isExpeditedOrder, parseDateLocal } from '@/lib/cart';
 import { bundles, products } from '@/lib/data';
 
 const productById = new Map(products.map(product => [product.id, product]));
@@ -69,7 +69,7 @@ function sanitizeCart(cart) {
   return [...normalizedProducts, ...normalizedBundles];
 }
 
-function buildStripeCheckoutParams({ lineItems, orderMeta, customerInfo, dayCount, origin, promoApplied, expediteFeeCents, promoCouponId, tosAcceptedAt, tosAcceptedIp }) {
+function buildStripeCheckoutParams({ lineItems, orderMeta, customerInfo, dayCount, origin, promoApplied, expediteFeeCents, taxAmountCents, promoCouponId, tosAcceptedAt, tosAcceptedIp }) {
   const params = new URLSearchParams();
 
   params.set('mode', 'payment');
@@ -150,6 +150,19 @@ function buildStripeCheckoutParams({ lineItems, orderMeta, customerInfo, dayCoun
     params.set(
       `line_items[${expediteIndex}][price_data][product_data][description]`,
       'Rush order fee for bookings starting within 24 hours'
+    );
+  }
+
+  if (taxAmountCents > 0) {
+    const extraCount = (DELIVERY_FEE_CENTS > 0 ? 1 : 0) + (expediteFeeCents > 0 ? 1 : 0);
+    const taxIndex = lineItems.length + extraCount;
+    params.set(`line_items[${taxIndex}][quantity]`, '1');
+    params.set(`line_items[${taxIndex}][price_data][currency]`, 'usd');
+    params.set(`line_items[${taxIndex}][price_data][unit_amount]`, String(taxAmountCents));
+    params.set(`line_items[${taxIndex}][price_data][product_data][name]`, 'Sales tax');
+    params.set(
+      `line_items[${taxIndex}][price_data][product_data][description]`,
+      'South Carolina sales tax on rental subtotal'
     );
   }
 
@@ -317,6 +330,9 @@ export async function POST(request) {
     }
   }
 
+  const taxableSubtotalDollars = rentalSubtotalCents / 100 - promoDiscountDollars;
+  const taxAmountCents = Math.round(getTaxAmount(taxableSubtotalDollars) * 100);
+
   const origin = request.headers.get('origin') || request.nextUrl.origin;
   const params = buildStripeCheckoutParams({
     lineItems,
@@ -326,6 +342,7 @@ export async function POST(request) {
     origin,
     promoApplied,
     expediteFeeCents,
+    taxAmountCents,
     promoCouponId,
     tosAcceptedAt,
     tosAcceptedIp

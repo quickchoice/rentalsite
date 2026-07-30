@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import HomePageClient from '@/app/home-page-client';
+import GoogleReviews from '@/components/GoogleReviews';
+import ServiceAreaMap from '@/components/ServiceAreaMap';
 import StructuredData from '@/components/StructuredData';
 import styles from '@/app/page.module.css';
+import { getGoogleReviews } from '@/lib/google-reviews';
 import { faqPageFaqs, homePageContent } from '@/lib/seo-content';
 import { buildMetadata } from '@/lib/site';
 import {
@@ -11,9 +14,9 @@ import {
 } from '@/lib/structured-data';
 
 export const metadata = buildMetadata({
-  title: 'Baby Gear, Beach Gear & Beach Wheelchair Rentals | QuickChoice Rentals',
+  title: 'Baby Gear & Beach Gear Rentals | QuickChoice Rentals',
   description:
-    'QuickChoice Rentals delivers clean, full-size baby gear, beach gear, and beach wheelchair rentals to your vacation stay in Myrtle Beach and Charleston, SC. Easy online booking, flat $20 delivery / pickup fee.',
+    'QuickChoice Rentals delivers clean, full-size baby gear and beach gear rentals to your vacation stay in Myrtle Beach and Charleston, SC. Easy online booking, flat $20 delivery / pickup fee.',
   path: '/',
   keywords: [
     'baby gear rentals Myrtle Beach SC',
@@ -21,7 +24,6 @@ export const metadata = buildMetadata({
     'crib rental delivery Myrtle Beach',
     'stroller rental vacation',
     'beach chair rental delivery',
-    'beach wheelchair rentals Charleston SC',
     'vacation rental gear delivery',
     'QuickChoice Rentals'
   ]
@@ -72,41 +74,6 @@ const testimonials = [
   }
 ];
 
-const categoryCards = [
-  {
-    ...homePageContent.popularPages.find(card => card.href === '/rentals/baby-gear'),
-    description: 'Cribs, strollers, high chairs, and the essentials that make travel easier.'
-  },
-  {
-    ...homePageContent.popularPages.find(card => card.href === '/rentals/beach-gear'),
-    description: 'Chairs, umbrellas, wagons, and beach-day basics delivered to your stay.'
-  },
-  {
-    ...homePageContent.popularPages.find(card => card.href === '/rentals/accessibility-equipment'),
-    description: 'Beach wheelchairs and mobility-friendly options for a smoother trip.'
-  },
-  {
-    ...homePageContent.popularPages.find(card => card.href === '/rentals/family-beach-bundle'),
-    title: 'Bundles',
-    description: 'Popular sets for families who want to book more in fewer clicks.'
-  }
-];
-
-const featuredCards = [
-  {
-    ...homePageContent.popularPages.find(card => card.href === '/rentals/crib-rentals'),
-    description: 'A full-size sleep setup without packing the bulky gear.'
-  },
-  {
-    ...homePageContent.popularPages.find(card => card.href === '/rentals/family-beach-bundle'),
-    title: 'Family Beach Bundle',
-    description: 'A simple way to cover the beach basics in one reservation.'
-  },
-  {
-    ...homePageContent.popularPages.find(card => card.href === '/rentals/beach-wheelchair-rentals'),
-    description: 'Reserve a beach wheelchair for easier access by the water.'
-  }
-];
 
 const locationCards = [
   {
@@ -139,7 +106,8 @@ function renderCard(card) {
   );
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const googleReviews = await getGoogleReviews();
   return (
     <>
       <StructuredData data={buildOrganizationSchema()} />
@@ -147,7 +115,7 @@ export default function HomePage() {
         data={buildLocalBusinessSchema({
           path: '/',
           description:
-            'QuickChoice Rentals delivers clean, full-size baby gear, beach gear, and beach wheelchair rentals to your vacation stay in Myrtle Beach and Charleston, SC.',
+            'QuickChoice Rentals delivers clean, full-size baby gear and beach gear rentals to your vacation stay in Myrtle Beach and Charleston, SC.',
           includeRating: true
         })}
       />
@@ -180,16 +148,6 @@ export default function HomePage() {
 
           <section className={styles.homeSection}>
             <div className={styles.sectionHeading}>
-              <h2>Shop by Category</h2>
-              <p>Start with the gear you need most.</p>
-            </div>
-            <div className={styles.cardGrid}>
-              {categoryCards.map(renderCard)}
-            </div>
-          </section>
-
-          <section className={styles.homeSection}>
-            <div className={styles.sectionHeading}>
               <h2>Locations</h2>
               <p>Choose your area and start browsing.</p>
             </div>
@@ -205,8 +163,8 @@ export default function HomePage() {
             </div>
             <div className={styles.coverageGrid}>
               <article className={styles.coverageItem}>
-                <h3>Myrtle Beach</h3>
-                <p>Gear for family beach trips, condo stays, and vacation rentals across the Grand Strand.</p>
+                <h3>Myrtle Beach Area</h3>
+                <p>Serving Myrtle Beach, North Myrtle Beach, Cherry Grove, Surfside Beach, Garden City, and Murrell's Inlet.</p>
               </article>
               <article className={styles.coverageItem}>
                 <h3>Charleston</h3>
@@ -219,39 +177,15 @@ export default function HomePage() {
             </div>
           </section>
 
-          {/* Testimonials — replace these quotes with real customer reviews from Google or direct feedback */}
           <section className={styles.homeSection}>
             <div className={styles.sectionHeading}>
-              <h2>What Customers Say</h2>
-              <p>Families who traveled lighter thanks to QuickChoice Rentals.</p>
+              <h2>Myrtle Beach Service Area</h2>
+              <p>We deliver across the Grand Strand — from Cherry Grove to Murrell's Inlet.</p>
             </div>
-            <div className={styles.testimonialGrid}>
-              {testimonials.map(item => (
-                <article key={item.author} className={`${styles.testimonialCard} card`}>
-                  <div className={styles.starsRow} aria-label="5 out of 5 stars">
-                    {'★★★★★'}
-                  </div>
-                  <blockquote className={styles.testimonialQuote}>
-                    <p>"{item.quote}"</p>
-                  </blockquote>
-                  <footer className={styles.testimonialAuthor}>
-                    <strong>{item.author}</strong>
-                    <span>{item.trip}</span>
-                  </footer>
-                </article>
-              ))}
-            </div>
+            <ServiceAreaMap />
           </section>
 
-          <section className={styles.homeSection}>
-            <div className={styles.sectionHeading}>
-              <h2>Popular Bundles & Favorites</h2>
-              <p>A few easy starting points for faster booking.</p>
-            </div>
-            <div className={styles.cardGrid}>
-              {featuredCards.map(renderCard)}
-            </div>
-          </section>
+          <GoogleReviews data={googleReviews} fallback={testimonials} />
 
           <section className={styles.homeSection}>
             <div className={styles.sectionHeading}>

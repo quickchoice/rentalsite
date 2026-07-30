@@ -1,0 +1,97 @@
+.wrap {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr 16rem;
+  align-items: start;
+}
+
+.mapFrame {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid rgba(31, 91, 150, 0.18);
+  box-shadow: 0 4px 16px rgba(17, 35, 57, 0.12);
+  aspect-ratio: 4 / 3;
+  background: #e8ecf0;
+}
+
+.mapImage {
+  object-fit: cover;
+  object-position: center;
+}
+
+.locationList {
+  display: grid;
+  gap: 0.65rem;
+  padding: 1rem;
+  border: 1px solid rgba(31, 91, 150, 0.14);
+  border-radius: 1rem;
+  background: rgba(247, 252, 255, 0.9);
+}
+
+.listLabel {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #1f4f7a;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+  color: #1e2735;
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0, 0, 0, 0.18);
+}
+
+.locName {
+  font-weight: 700;
+}
+
+.locNote {
+  font-size: 0.78rem;
+  color: #5a6d7c;
+}
+
+.listFooter {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #5a6d7c;
+  border-top: 1px solid rgba(31, 91, 150, 0.12);
+  padding-top: 0.55rem;
+}
+
+.contactLink {
+  color: #1f5b96;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.14em;
+}
+
+@media (max-width: 760px) {
+  .wrap {
+    grid-template-columns: 1fr;
+  }
+
+  .mapFrame {
+    aspect-ratio: 16 / 10;
+  }
+}

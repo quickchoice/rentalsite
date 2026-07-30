@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import RentalsShell from '@/components/RentalsShell';
 import styles from '@/app/summary/page.module.css';
 import { useStore } from '@/context/StoreContext';
-import { formatMoney, getBundleBasePricePerDay, getBundleById, getDayCount, getDeliveryFee, getExpediteFee, getProductById, getPromoDiscount, isExpeditedOrder } from '@/lib/cart';
+import { formatMoney, getBundleBasePricePerDay, getBundleById, getDayCount, getDeliveryFee, getExpediteFee, getProductById, getPromoDiscount, getTaxAmount, isExpeditedOrder } from '@/lib/cart';
 import { locations } from '@/lib/data';
 import { withBasePath } from '@/lib/paths';
 
@@ -77,7 +77,9 @@ export default function SummaryPage() {
   const deliveryFee = getDeliveryFee(cart);
   const expediteFee = getExpediteFee(orderMeta);
   const promoDiscount = getPromoDiscount(subtotal);
-  const totalWithFees = subtotal + deliveryFee + expediteFee - promoDiscount;
+  const taxableAmount = subtotal - promoDiscount;
+  const taxAmount = getTaxAmount(taxableAmount);
+  const totalWithFees = subtotal + deliveryFee + expediteFee - promoDiscount + taxAmount;
   const isRushOrder = isExpeditedOrder(orderMeta);
   const locationName = locations.find(location => location.id === orderMeta.location)?.name || 'Not selected';
   const deliveryAreas = [
@@ -230,6 +232,7 @@ export default function SummaryPage() {
               <strong className={styles.promoAmount}>-{formatMoney(promoDiscount)}</strong>
             </div>
           )}
+          <div className={styles.subtotal}><span>Sales tax</span><strong>{formatMoney(taxAmount)}</strong></div>
           <div className={styles.subtotal}><span>Total</span><strong>{formatMoney(totalWithFees)}</strong></div>
           <div className={styles.contactBlock}>
             <h2>Contact Info</h2>

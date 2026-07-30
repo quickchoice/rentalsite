@@ -4,7 +4,35 @@ import Link from 'next/link';
 import styles from '@/components/CartDrawer.module.css';
 import { useStore } from '@/context/StoreContext';
 import { formatMoney, getBundleBasePricePerDay, getBundleById, getBundleTier, getDayCount, getDeliveryFee, getExpediteFee, getProductById, getPromoDiscount, isExpeditedOrder } from '@/lib/cart';
-import { locations } from '@/lib/data';
+import { locations, products } from '@/lib/data';
+
+const BEACH_PICKS = ['beach-chair-umbrella', 'beach-umbrella', 'beach-wagon', 'beach-tent', 'beach-cooler', 'beach-recliner'];
+const BABY_PICKS  = ['baby-cribs', 'baby-pack-n-play', 'baby-single-jogging-stroller', 'baby-noise-machine', 'baby-high-chair-tray'];
+
+function getSuggestions(cart) {
+  const inCart = new Set(cart.map(l => l.productId).filter(Boolean));
+  const cats = new Set(cart.map(l => {
+    if (l.type === 'bundle') return getBundleById(l.bundleId)?.categoryId;
+    return getProductById(l.productId)?.categoryId;
+  }).filter(Boolean));
+
+  let pool = [];
+  if (cats.has('beach') && cats.has('baby')) {
+    pool = [...BEACH_PICKS, ...BABY_PICKS];
+  } else if (cats.has('beach')) {
+    pool = [...BEACH_PICKS, ...BABY_PICKS];
+  } else if (cats.has('baby')) {
+    pool = [...BABY_PICKS, ...BEACH_PICKS];
+  } else {
+    pool = [...BABY_PICKS, ...BEACH_PICKS];
+  }
+
+  return pool
+    .filter(id => !inCart.has(id))
+    .slice(0, 3)
+    .map(id => products.find(p => p.id === id))
+    .filter(Boolean);
+}
 
 export default function CartDrawer() {
   const {
@@ -16,8 +44,11 @@ export default function CartDrawer() {
     setOrderMeta,
     setLocation,
     updateQty,
-    removeFromCart
+    removeFromCart,
+    addToCart
   } = useStore();
+
+  const suggestions = cart.length ? getSuggestions(cart) : [];
 
   const dayCount = getDayCount(orderMeta);
   const hasSelectedDates = Boolean(orderMeta.startDate && orderMeta.endDate);
@@ -137,6 +168,29 @@ export default function CartDrawer() {
             );
           })}
         </div>
+
+        {suggestions.length > 0 && (
+          <div className={styles.suggestions}>
+            <p className={styles.suggestLabel}>You might also like</p>
+            {suggestions.map(product => (
+              <div key={product.id} className={styles.suggestLine}>
+                <img src={product.imageUrl} alt={product.name} className={styles.suggestThumb} />
+                <div className={styles.suggestInfo}>
+                  <span className={styles.suggestName}>{product.name}</span>
+                  <span className={styles.suggestPrice}>{formatMoney(product.pricePerDay)}/day</span>
+                </div>
+                <button
+                  type="button"
+                  className={styles.suggestAdd}
+                  onClick={() => addToCart(product.id, 1)}
+                  aria-label={`Add ${product.name} to cart`}
+                >
+                  + Add
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className={styles.meta}>
           <strong>Service Area</strong>

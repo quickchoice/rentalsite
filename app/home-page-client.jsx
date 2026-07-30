@@ -102,17 +102,17 @@ export default function HomePageClient() {
       </section>
 
       <section className={styles.intro}>
-        <h1>Baby gear, beach gear, and beach wheelchair rentals for Myrtle Beach and Charleston.</h1>
+        <h1>Baby gear and beach gear rentals for Myrtle Beach and Charleston.</h1>
         <p>
           Clean, full-size rentals delivered right to your stay.
         </p>
 
         <div className={styles.ctaRow}>
           <Link href="/category/baby" className={`${styles.cta} ${styles.ctaPrimary}`}>
-            Browse Baby Gear
+            Rent Baby Gear
           </Link>
           <Link href="/category/beach" className={`${styles.cta} ${styles.ctaSecondary}`}>
-            Browse Beach Gear
+            Rent Beach Gear
           </Link>
         </div>
 

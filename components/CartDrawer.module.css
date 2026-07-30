@@ -10,7 +10,7 @@
   border-left: 1px solid #d5bb8b;
   box-shadow: var(--shadow);
   display: grid;
-  grid-template-rows: auto 1fr auto auto;
+  grid-template-rows: auto 1fr auto auto auto;
   gap: 0.8rem;
   padding: 1rem;
   z-index: 120;
@@ -109,6 +109,84 @@
 .discountLabel {
   color: #0f4d21;
   font-weight: 800;
+}
+
+/* ── You might also like ──────────────────────── */
+.suggestions {
+  border: 1px solid #d9c99a;
+  border-radius: 0.7rem;
+  background: rgba(255, 250, 238, 0.9);
+  padding: 0.55rem 0.65rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.suggestLabel {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #7a5c2a;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.suggestLine {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.suggestThumb {
+  width: 2.4rem;
+  height: 2.4rem;
+  object-fit: contain;
+  border-radius: 0.4rem;
+  border: 1px solid #dbc39b;
+  background: #fff;
+}
+
+.suggestInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  overflow: hidden;
+}
+
+.suggestName {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1e2735;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.suggestPrice {
+  font-size: 0.76rem;
+  color: #5a6d7c;
+}
+
+.suggestAdd {
+  border: 1px solid #1f5b96;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #e8f4ff, #cce5fb);
+  color: #1a4a80;
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 0.22rem 0.55rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 100ms ease, background 100ms ease;
+}
+
+.suggestAdd:hover {
+  background: linear-gradient(180deg, #cce5fb, #b0d7f8);
+  transform: translateY(-1px);
+}
+
+.suggestAdd:active {
+  transform: translateY(1px);
 }
 
 .meta {

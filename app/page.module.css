@@ -158,6 +158,18 @@
   gap: 0.95rem;
 }
 
+@keyframes ctaShimmer {
+  0%   { transform: translateX(-180%) skewX(-18deg); opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { transform: translateX(280%) skewX(-18deg); opacity: 0; }
+}
+
+@keyframes ctaPulse {
+  0%, 100% { box-shadow: 0 8px 22px rgba(17, 35, 57, 0.24); }
+  50%       { box-shadow: 0 10px 36px rgba(19, 61, 102, 0.52); }
+}
+
 .cta {
   min-width: 16rem;
   border-radius: 999px;
@@ -166,32 +178,55 @@
   font-size: clamp(1rem, 1.55vw, 1.45rem);
   font-weight: 800;
   line-height: 1.1;
-  box-shadow: 0 8px 18px rgba(17, 35, 57, 0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.cta::after {
-  content: '›';
-  margin-left: 0.55rem;
-  font-size: 1.15em;
+  box-shadow: 0 8px 22px rgba(17, 35, 57, 0.24);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .ctaPrimary {
   background: linear-gradient(90deg, #133d66, #1f5f91);
+  animation: ctaPulse 2.8s ease-in-out infinite;
+}
+
+.ctaPrimary::after {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: 0;
+  width: 40%;
+  height: 120%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+  animation: ctaShimmer 3.8s ease-in-out infinite;
+  animation-delay: 0.8s;
+  pointer-events: none;
 }
 
 .ctaSecondary {
   background: linear-gradient(90deg, #58a5cc, #77c0df);
 }
 
+.ctaSecondary::after {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: 0;
+  width: 40%;
+  height: 120%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.22) 50%, transparent 100%);
+  animation: ctaShimmer 3.8s ease-in-out infinite;
+  animation-delay: 2.2s;
+  pointer-events: none;
+}
+
 .cta:hover,
 .cta:focus-visible {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(17, 35, 57, 0.26);
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 16px 32px rgba(17, 35, 57, 0.34);
 }
 
 .cta:active {
-  transform: translateY(2px) scale(0.985);
+  transform: translateY(2px) scale(0.982);
   box-shadow: 0 4px 10px rgba(17, 35, 57, 0.2);
 }
 
@@ -572,6 +607,63 @@
 .testimonialAuthor span {
   color: #5a6d7c;
   font-size: 0.85rem;
+}
+
+/* ── Google Reviews ───────────────────────────── */
+.googleRatingRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.9rem;
+  margin-top: 0.2rem;
+}
+
+.googleRatingText {
+  color: #374456;
+  font-size: 1rem;
+}
+
+.googleReviewsLink {
+  color: #1f5b96;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.googleReviewsLink:hover,
+.googleReviewsLink:focus-visible {
+  color: #133d66;
+}
+
+.googleReviewAuthor {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.googleAvatar {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.googleAuthorMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.googleAuthorName {
+  color: #1f4f7a;
+  font-size: 0.95rem;
+}
+
+.googleReviewTime {
+  color: #5a6d7c;
+  font-size: 0.82rem;
 }
 
 /* ── CTA Panel ────────────────────────────────── */
